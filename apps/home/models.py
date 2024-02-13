@@ -73,6 +73,7 @@ class MyUserManager(BaseUserManager):
             username,
             password=password,
         )
+        self.is_hashed = True
         user.is_admin = True
         user.is_superuser = True
         print(f"{user.is_admin=:}")
@@ -89,6 +90,8 @@ class Person(AbstractBaseUser):
     full_name = models.CharField(max_length=50, blank=True, editable=False)
     ncode = models.CharField(max_length=11, verbose_name="کدملی")
     scode = models.CharField(max_length=10, verbose_name="کدبیمه ورزشی")
+    insurancedate = jmodels.jDateField(
+        verbose_name="تاریخ ثبت بیمه ورزشی", null=True)
     shistory = models.TextField(verbose_name="سابقه ورزشی", blank=True)
     hhistory = models.TextField(verbose_name="سابقه پزشکی", blank=True)
     dob = jmodels.jDateField(verbose_name="تاریخ تولد", null=True)
@@ -203,21 +206,19 @@ class AbsenceDate(models.Model):
         verbose_name_plural = "غیبتها"
 
     def __str__(self):
-        return f"{self.session_person} {self.doa}"
+        return f"{self.absent_person} {self.doa}"
 
 
 class Analysis (models.Model):
     id = models.AutoField(primary_key=True, verbose_name='ردیف')
     analysis_person = models.ForeignKey(
-        Person, on_delete=models.CASCADE, verbose_name='شخص')
+        Person, on_delete=models.CASCADE, verbose_name='شخص')    
     dot = jmodels.jDateField(verbose_name="تاریخ آنالیز")
 
     current_state_weight = models.FloatField(verbose_name="وضعیت موجود - وزن")
-    current_state_bfm = models.FloatField(
-        verbose_name="وضعیت موجود - توده چربی")
+    current_state_bfm = models.FloatField(verbose_name="وضعیت موجود - توده چربی")
     current_state_smm = models.FloatField(verbose_name="وضعیت موجود - عضله ")
-    current_state_pbf = models.FloatField(
-        verbose_name="وضعیت موجود - درصد چربی")
+    current_state_pbf = models.FloatField(verbose_name="وضعیت موجود - درصد چربی")
 
     point_state_weight = models.FloatField(verbose_name="هدف مقطعی - وزن")
     point_state_bfm = models.FloatField(verbose_name="هدف مقطعی - توده چربی")
@@ -229,4 +230,11 @@ class Analysis (models.Model):
         verbose_name_plural = "آنالیزها"
 
     def __str__(self):
-        return ""
+        return  f"{self.analysis_person} {self.dot}"
+
+
+
+
+
+
+

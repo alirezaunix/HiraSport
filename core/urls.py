@@ -14,12 +14,6 @@ urlpatterns = [
     # Auth routes - login / register
     path("", include("apps.authentication.urls")),
 
-
-    url(
-        'autocomplete/$',
-        autocomplete.Select2QuerySetView.as_view(model=Person),
-        name='select2_fk',
-    ),
     # ADD NEW Routes HERE
 
     # Leave `Home.Urls` as last the last line

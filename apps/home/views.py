@@ -29,8 +29,7 @@ class PersonAutocomplete(autocomplete.Select2QuerySetView):
         #    return Person.objects.none()
         qs = Person.objects.all()
         if self.q:
-            qs = qs.filter(first_name__istartswith=self.q,
-                           last_name__istartwith=self.q)
+            qs = qs.filter(first_name__istartswith=self.q)
         return qs
 
 
@@ -180,9 +179,15 @@ def personalreport(request, person_id):
                 session_person=person, dos=jdatetime.datetime.now())
 
         context = {'segment': 'personalreport'}
+        analysisperson=Analysis.objects.get(id=person_id)
+        lastanalysis=analysisperson.dot
+        print(lastanalysis)
+        
         person = Person.objects.get(id=person_id)
         context['person'] = person
         context['imglen'] = len(person.simage.name)
+        l1 = str(person.insurancedate).split("-")
+        context['nextinsurance']=f"{int(l1[0])+1}-{l1[1]}-{l1[2]}"
         context['buttonShow'] = True if request.user.is_admin else False
         html_template = loader.get_template('home/personalreport.html')
         return HttpResponse(html_template.render(context, request))

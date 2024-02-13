@@ -2,13 +2,15 @@
 
 from django.contrib.auth.models import User
 from django.contrib import admin
-from .models import Person, SportField, Peyment, SessionDate, Classi, Trainer, AbsenceDate
+from .models import Person, SportField, Peyment, SessionDate, Classi, Trainer, AbsenceDate,Analysis
 from django.db.models.signals import post_save
-from .forms import PeymentForm, SessionForm, ClassiForm
+from .forms import PeymentForm, SessionForm, ClassiForm, AnalysisForm
 from django.dispatch import receiver
 from django.contrib.auth.models import User
 
 
+    
+    
 @admin.register(Trainer)
 class TrainerAdmin(admin.ModelAdmin):
     list_display = ['id', 'tsport', 'tfull_name', 'tphone']
@@ -43,13 +45,23 @@ class PeymentAdmin(admin.ModelAdmin):
 class SessionDateAdmin(admin.ModelAdmin):
     list_display = ['id', 'session_person', 'dos']
     form = SessionForm
+    model = SessionDate
 
 
 @admin.register(Classi)
-class SessionDateAdmin(admin.ModelAdmin):
+class ClassiAdmin(admin.ModelAdmin):
     list_display = ['id', 'weekdays', 'cname', 'starttime',]
     form = ClassiForm
     search_fields = ['session_person']
+
+
+@admin.register(Analysis)
+class AnalysisAdmin(admin.ModelAdmin):
+    list_display = ['id', 'analysis_person']
+    form = AnalysisForm
+    model=Analysis
+    list_filter = ['analysis_person']
+    search_fields = ['analysis_person']
 
 
 @admin.register(AbsenceDate)
