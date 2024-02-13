@@ -231,10 +231,3 @@ class Analysis (models.Model):
 
     def __str__(self):
         return  f"{self.analysis_person} {self.dot}"
-
-
-
-
-
-
-

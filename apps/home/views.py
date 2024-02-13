@@ -111,6 +111,7 @@ def analyzereport(request):
     return HttpResponse(html_template.render(context, request))
 
 
+'''
 @login_required(login_url="/login/")
 def peymentreport(request, person_id):
     context = {'segment': 'peymentreport'}
@@ -142,7 +143,7 @@ def absencereport(request, person_id):
     context['full_name'] = person.full_name
     html_template = loader.get_template('home/absencereport.html')
     return HttpResponse(html_template.render(context, request))
-
+'''
 
 @login_required(login_url="/login/")
 def classlist(request, ccname):
@@ -172,23 +173,36 @@ def classlist(request, ccname):
 @login_required(login_url="/login/")
 def personalreport(request, person_id):
     if str(request.user.username) == Person.objects.get(id=person_id).username or request.user.is_admin:
+        person_id = (request.path.split('/')[-1])
         if request.method == 'POST':
-            person_id = (request.path.split('/')[-1])
             person = Person.objects.get(id=person_id)
             SessionDate.objects.create(
                 session_person=person, dos=jdatetime.datetime.now())
-
-        context = {'segment': 'personalreport'}
-        analysisperson=Analysis.objects.get(id=person_id)
-        lastanalysis=analysisperson.dot
-        print(lastanalysis)
         
         person = Person.objects.get(id=person_id)
+
+        analysisperson = Analysis.objects.get(analysis_person=person_id)
+        lastanalysis = str(analysisperson.dot).split("-")
+
+        context = {'segment': 'personalreport'}
+        context['nextanalysis'] = f"{lastanalysis[0]}-{int(lastanalysis[1])+1}-{lastanalysis[2]}"
+
         context['person'] = person
         context['imglen'] = len(person.simage.name)
         l1 = str(person.insurancedate).split("-")
         context['nextinsurance']=f"{int(l1[0])+1}-{l1[1]}-{l1[2]}"
         context['buttonShow'] = True if request.user.is_admin else False
+        
+        session = SessionDate.objects.filter(session_person=person_id)
+        context['session'] = session
+
+        absence = AbsenceDate.objects.filter(absent_person=person_id)
+        context['absence'] = absence
+
+        peyment = Peyment.objects.filter(peyment_person=person_id)
+        context['peyment'] = peyment
+
+
         html_template = loader.get_template('home/personalreport.html')
         return HttpResponse(html_template.render(context, request))
     else:
