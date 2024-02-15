@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib import admin
 from .models import Person, SportField, Peyment, SessionDate, Classi, Trainer, AbsenceDate,Analysis
 from django.db.models.signals import post_save
-from .forms import PeymentForm, SessionForm, ClassiForm, AnalysisForm
+from .forms import PeymentForm, SessionForm, ClassiForm #AnalysisForm
 from django.dispatch import receiver
 from django.contrib.auth.models import User
 
@@ -20,7 +20,7 @@ class TrainerAdmin(admin.ModelAdmin):
 
 @admin.register(Person)
 class PersonAdmin(admin.ModelAdmin):
-    list_display = ['first_name', 'last_name', "ncode",  "scode",   "dob",
+    list_display = ['id','first_name', 'last_name', "ncode",  "scode",   "dob",
                     "gender", "classname", "sfield", "rsession", 'username', 'password']
     search_fields = ['first_name', 'last_name']
     list_filter = ['classname', 'gender', 'sfield']
@@ -58,8 +58,8 @@ class ClassiAdmin(admin.ModelAdmin):
 @admin.register(Analysis)
 class AnalysisAdmin(admin.ModelAdmin):
     list_display = ['id', 'analysis_person']
-    form = AnalysisForm
-    model=Analysis
+    #form = AnalysisForm
+    #model = Analysis
     list_filter = ['analysis_person']
     search_fields = ['analysis_person']
 

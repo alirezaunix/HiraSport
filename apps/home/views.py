@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 from django.urls import reverse
-from .models import Person, Classi, SessionDate, Peyment, AbsenceDate, Analysis
+from .models import Person, Classi, SessionDate, Peyment, AbsenceDate, Analysis,Trainer
 from dal import autocomplete
 import jdatetime
 from django.conf.urls.static import static
@@ -50,7 +50,7 @@ def index(request):
 
 
 @login_required(login_url="/login/")
-def tables(request):
+def todayclasslist(request):
     context = {'segment': 'index'}
     context['jdate'] = date_maker()
     weekday = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat",]
@@ -75,8 +75,10 @@ def tables(request):
     for objP in Person.objects.all():
         counter = 0
         for item in classesname:
-            if item in objP.classname.cname:
-                counter += 1
+            if not objP.is_admin:
+                print("******",objP.id)
+                if item in objP.classname.cname:
+                    counter += 1
         personcount.append(counter)
 
     row_data = []
@@ -89,7 +91,7 @@ def tables(request):
         a_row = {}
     context['row_data'] = row_data
 
-    html_template = loader.get_template('home/tables.html')
+    html_template = loader.get_template('home/todayclasslist.html')
     return HttpResponse(html_template.render(context, request))
 
 
@@ -162,10 +164,15 @@ def classlist(request, ccname):
     context = {'segment': 'classlist'}
     person = []
     for obj in Person.objects.all():
-        if obj.classname.cname == ccname:
-            person.append(obj)
+        if not obj.is_admin:
+            if obj.classname.cname == ccname  :
+                person.append(obj)
     context['person'] = person
     context['cname'] = ccname
+    trainers=[]
+    for obj in Trainer.objects.all():
+        trainers.append(obj)
+    context['trainers']=trainers
     html_template = loader.get_template('home/classlist.html')
     return HttpResponse(html_template.render(context, request))
 

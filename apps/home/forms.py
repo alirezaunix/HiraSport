@@ -1,8 +1,7 @@
 
 from dal import autocomplete
-
 from django import forms
-from .models import Peyment, SessionDate, Classi, Analysis
+from .models import Peyment, SessionDate, Classi, Analysis,Person
 
 class PeymentForm(forms.ModelForm):
     class Meta:
@@ -23,17 +22,8 @@ class SessionForm(forms.ModelForm):
         widgets = {
             'session_person': autocomplete.ModelSelect2(url='select2_fk'), 
         }
-class AnalysisForm(forms.ModelForm):
-    class Meta:
-        model = Analysis
-        fields = ('id', 'analysis_person', 'dot', 'current_state_weight', 'current_state_bfm', 'current_state_smm',
-                  'current_state_pbf', 'point_state_weight', 'point_state_bfm', 'point_state_smm', 'point_state_pbf')
 
-        search_fields = ['id', 'analysis_person', 'dot',]
 
-        widgets = {
-            'analysis_person': autocomplete.ModelSelect2(url='select2_fk'),
-        }
 
         
 class TimePickerInput(forms.TimeInput):

@@ -164,8 +164,7 @@ class Person(AbstractBaseUser):
 
 class Peyment(models.Model):
     id = models.AutoField(primary_key=True, verbose_name='ردیف')
-    peyment_person = models.ForeignKey(
-        Person, on_delete=models.CASCADE, verbose_name='شخص', blank=True, null=True)
+    peyment_person = models.ForeignKey(Person, on_delete=models.CASCADE, verbose_name='شخص', blank=True, null=True)
     dop = jmodels.jDateField(verbose_name="تاریخ پرداخت")
     rimage = models.ImageField(
         verbose_name="عکس فیش پرداختی", null=True, blank=True)
@@ -183,8 +182,7 @@ class Peyment(models.Model):
 
 class SessionDate(models.Model):
     id = models.AutoField(primary_key=True, verbose_name='ردیف')
-    session_person = models.ForeignKey(
-        Person, on_delete=models.CASCADE, verbose_name='شخص')
+    session_person = models.ForeignKey(Person, on_delete=models.CASCADE, verbose_name='شخص')
     dos = jmodels.jDateField(verbose_name="تاریخ جلسه")
 
     class Meta:
@@ -197,8 +195,7 @@ class SessionDate(models.Model):
 
 class AbsenceDate(models.Model):
     id = models.AutoField(primary_key=True, verbose_name='ردیف')
-    absent_person = models.ForeignKey(
-        Person, on_delete=models.CASCADE, verbose_name='شخص')
+    absent_person = models.ForeignKey(Person, on_delete=models.CASCADE, verbose_name='شخص')
     doa = jmodels.jDateField(verbose_name="تاریخ غیبت")
 
     class Meta:
@@ -211,10 +208,9 @@ class AbsenceDate(models.Model):
 
 class Analysis (models.Model):
     id = models.AutoField(primary_key=True, verbose_name='ردیف')
-    analysis_person = models.ForeignKey(
-        Person, on_delete=models.CASCADE, verbose_name='شخص')    
+    analysis_person = models.ForeignKey(Person, on_delete=models.CASCADE, verbose_name='شخص' ,blank=True, null=True)
     dot = jmodels.jDateField(verbose_name="تاریخ آنالیز")
-
+    
     current_state_weight = models.FloatField(verbose_name="وضعیت موجود - وزن")
     current_state_bfm = models.FloatField(verbose_name="وضعیت موجود - توده چربی")
     current_state_smm = models.FloatField(verbose_name="وضعیت موجود - عضله ")

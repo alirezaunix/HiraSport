@@ -1,0 +1,277 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Tables Data {% endblock %} 
+
+<!-- Element injected in the BODY element -->
+{% block body_class %} {% endblock body_class %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+  <link rel="stylesheet" href="{{ ASSETS_ROOT }}/dist/css/bootstrap-theme.css">
+  <!-- Bootstrap rtl -->
+  <link rel="stylesheet" href="{{ ASSETS_ROOT }}/dist/css/rtl.css">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="{{ ASSETS_ROOT }}/bower_components/font-awesome/css/font-awesome.min.css">
+  <!-- Ionicons -->
+  <link rel="stylesheet" href="{{ ASSETS_ROOT }}/bower_components/Ionicons/css/ionicons.min.css">
+  <!-- DataTables -->
+  <link rel="stylesheet" href="{{ ASSETS_ROOT }}//bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="{{ ASSETS_ROOT }}/dist/css/AdminLTE.css">
+  <!-- AdminLTE Skins. Choose a skin from the css/skins
+       folder instead of downloading all of them to reduce the load. -->
+  <link rel="stylesheet" href="{{ ASSETS_ROOT }}//dist/css/skins/_all-skins.min.css">
+  
+  <link rel="stylesheet" href="{{ ASSETS_ROOT }}/bower_components/select2/dist/css/select2.min.css">
+
+
+  <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
+  <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+  <![endif]-->
+
+{% endblock stylesheets %}
+
+{% block content %} 
+
+  <!-- Content Wrapper. Contains page content -->
+ <div class="wrapper">
+
+  
+  <!-- right side column. contains the logo and sidebar -->
+  
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+          کلاس {{cname}}
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> خانه</a></li>
+        <li><a href="#">جدول</a></li>
+        <li class="active">پیشرفته</li>
+      </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="row">
+        <div class="col-xs-12">
+          <!-- /.box -->
+
+   <div class="row">
+        <div class="col-xs-12">
+          <div class="box">
+            <div class="box-header">
+              <h3 class="box-title"> لیست نفرات</h3>
+
+              <div class="box-tools">
+                <div class="input-group input-group-sm" style="width: 150px;">
+
+                  
+                </div>
+              </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body table-responsive no-padding">
+                <form id="myForm" method='POST'>
+                {% csrf_token %}
+
+              <table class="table table-hover">
+                 <tr>
+                                <th>نام و نام خانوادگی</th>
+                                <th>کلاس</th>
+                                <th>تعداد جلسات مانده</th>
+                                <th> حضور و غیاب</th>
+
+                </tr>
+                            {% for p in person %}
+                                {% if p.rsession < 4 %}
+                                    <tr bgcolor="red">
+                                {%elif p.rsession < 6 %}
+                                    <tr bgcolor="yellow">
+                                {%endif%}
+                                <td><a href='/personalreport/{{p.id}}'</a>{{p.full_name}}</td>
+                                <td>{{p.classname.cname}}</td>
+                                <td>{{p.rsession}}</td>
+                                <td>
+                                    <input type="radio" id="present" name="status_{{p.id}}" class="flat-red" value="present_{{p.id}}">
+                                    <label for="html">حاضر&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>                          
+                                    <input type="radio" id="absent" name="status_{{p.id}}" class="flat-red" value="absent_{{p.id}}">
+                                    <label for="css">غایب</label>
+                                </td>
+                            </tr>
+                            {% endfor %}
+
+              </table>
+            </div>
+            <!-- /.box-body -->
+          </div>
+          <!-- /.box -->
+        </div>
+      
+      
+          <!-- /.box -->
+
+        </div>
+        <div class="col-xs-12">
+          <div class="box">
+            <div class="box-header">
+              <h3 class="box-title">مربی  کلاس</h3>
+              <div class="box-tools">
+                <div class="input-group input-group-sm" style="width: 150px;">                  
+                </div>
+              </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body " style="width: 75%;">
+
+              <div class="form-group">
+                <select class="form-control select2" style="width: 30%;">
+                  
+                  {% for trainer in trainers %}
+                  <option>{{trainer.tfull_name}}</option>
+                  {% endfor%}
+
+                </select>
+              </div>
+            </form>
+            </div>
+            <!-- /.box-body -->
+          </div>
+          <!-- /.box -->
+        </div>
+        <!-- /.col -->
+
+                            <div class="col-xl-2 col-md-6" >
+                          <button form="myForm" type="submit" name="register" class="btn btn-danger">ثبت حضور و غیاب</button>
+
+      </div>
+      <!-- /.row -->
+    </section>
+    <!-- /.content -->
+  </div>
+  
+</div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+
+  <!-- jQuery -->
+  <script src="{{ ASSETS_ROOT }}/plugins/jquery/jquery.min.js"></script>
+  <!-- Bootstrap 4 -->
+  <script src="{{ ASSETS_ROOT }}/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <!-- DataTables -->
+  <script src="{{ ASSETS_ROOT }}/plugins/datatables/jquery.dataTables.min.js"></script>
+  <script src="{{ ASSETS_ROOT }}/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+  <script src="{{ ASSETS_ROOT }}/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+  <script src="{{ ASSETS_ROOT }}/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+  <script src="{{ ASSETS_ROOT }}/bower_components/select2/dist/js/select2.full.min.js"></script>
+
+  <!-- AdminLTE App -->
+  <link rel="stylesheet" href="{{ ASSETS_ROOT }}/dist/css/AdminLTE.css">
+  <!-- AdminLTE for demo purposes -->
+  <script src="{{ ASSETS_ROOT }}/js/demo.js"></script>
+  <!-- page script -->
+  <script>
+    $(function () {
+      $("#example1").DataTable({
+        "responsive": true,
+        "autoWidth": false,
+      });
+      $('#example2').DataTable({
+        "paging": true,
+        "lengthChange": false,
+        "searching": false,
+        "ordering": true,
+        "info": true,
+        "autoWidth": false,
+        "responsive": true,
+      });
+    });
+  </script>
+<script>
+    $(document).ready(function () {
+        $('#tarikh').persianDatepicker({
+            altField: '#tarikhAlt',
+            altFormat: 'X',
+            format: 'D MMMM YYYY HH:mm a',
+            observer: true,
+            timePicker: {
+                enabled: true
+            },
+        });
+    });
+  $(function () {
+    //Initialize Select2 Elements
+    $('.select2').select2()
+
+    //Datemask dd/mm/yyyy
+    $('#datemask').inputmask('dd/mm/yyyy', { 'placeholder': 'dd/mm/yyyy' })
+    //Datemask2 mm/dd/yyyy
+    $('#datemask2').inputmask('mm/dd/yyyy', { 'placeholder': 'mm/dd/yyyy' })
+    //Money Euro
+    $('[data-mask]').inputmask()
+
+    //Date range picker
+    $('#reservation').daterangepicker()
+    //Date range picker with time picker
+    $('#reservationtime').daterangepicker({ timePicker: true, timePickerIncrement: 30, format: 'MM/DD/YYYY h:mm A' })
+    //Date range as a button
+    $('#daterange-btn').daterangepicker(
+      {
+        ranges   : {
+          'Today'       : [moment(), moment()],
+          'Yesterday'   : [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+          'Last 7 Days' : [moment().subtract(6, 'days'), moment()],
+          'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+          'This Month'  : [moment().startOf('month'), moment().endOf('month')],
+          'Last Month'  : [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        },
+        startDate: moment().subtract(29, 'days'),
+        endDate  : moment()
+      },
+      function (start, end) {
+        $('#daterange-btn span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'))
+      }
+    )
+
+    //Date picker
+    $('#datepicker').datepicker({
+      autoclose: true
+    })
+
+    //iCheck for checkbox and radio inputs
+    $('input[type="checkbox"].minimal, input[type="radio"].minimal').iCheck({
+      checkboxClass: 'icheckbox_minimal-blue',
+      radioClass   : 'iradio_minimal-blue'
+    })
+    //Red color scheme for iCheck
+    $('input[type="checkbox"].minimal-red, input[type="radio"].minimal-red').iCheck({
+      checkboxClass: 'icheckbox_minimal-red',
+      radioClass   : 'iradio_minimal-red'
+    })
+    //Flat red color scheme for iCheck
+    $('input[type="checkbox"].flat-red, input[type="radio"].flat-red').iCheck({
+      checkboxClass: 'icheckbox_flat-green',
+      radioClass   : 'iradio_flat-green'
+    })
+
+    //Colorpicker
+    $('.my-colorpicker1').colorpicker()
+    //color picker with addon
+    $('.my-colorpicker2').colorpicker()
+
+    //Timepicker
+    $('.timepicker').timepicker({
+      showInputs: false
+    })
+  })
+</script>
+{% endblock javascripts %}
