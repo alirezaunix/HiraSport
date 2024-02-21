@@ -18,8 +18,10 @@ urlpatterns = [
     path('', views.index, name='home'),
 
     path('debt/', views.debt, name='debt'),
-    path('personalreport/<int:person_id>',
-         views.personalreport, name='personalreport'),
+    path('personalreport/<int:person_id>',views.personalreport, name='personalreport'),
+    path('trainerreport/<int:trainer_id>',
+         views.trainerreport, name='trainerreport'),
+
     #path('peymentreport/<int:person_id>',
     #     views.peymentreport, name='peymentreport'),
     #path('sessionreport/<int:person_id>',
@@ -28,6 +30,7 @@ urlpatterns = [
     #     views.absencereport, name='absencereport'),
     path('classlist/<str:ccname>', views.classlist, name='classlist'),
     path('todayclasslist/', views.todayclasslist, name='todayclasslist'),
+    path('trainerslist/', views.trainerslist, name='trainerslist'),
 
     url(
         r'^autocomplete/$',

@@ -5,11 +5,13 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 from django.urls import reverse
-from .models import Person, Classi, SessionDate, Peyment, AbsenceDate, Analysis,Trainer
+from .models import Person, Classi, SessionDate, Peyment, AbsenceDate, Analysis,Trainer,TrainerSeesion
 from dal import autocomplete
 import jdatetime
 from django.conf.urls.static import static
 from django.conf import settings
+from django.contrib.auth.models import User
+
 
 
 def date_maker():
@@ -36,6 +38,13 @@ class PersonAutocomplete(autocomplete.Select2QuerySetView):
 @login_required(login_url="/login/")
 def index(request):
    if request.user.is_admin:
+        '''
+        print(dir(User))
+        
+        print("---------------")
+        print(request.user.hash_password())
+        print("---------------")
+        print(dir(Person))'''
         context = {'segment': 'index'}
         context['jdate'] = date_maker()
         person = Person.objects.all()
@@ -113,43 +122,11 @@ def analyzereport(request):
     return HttpResponse(html_template.render(context, request))
 
 
-'''
-@login_required(login_url="/login/")
-def peymentreport(request, person_id):
-    context = {'segment': 'peymentreport'}
-    person = Person.objects.get(id=person_id)
-    peyment = Peyment.objects.filter(peyment_person=person_id)
-    context['peyment'] = peyment
-    context['full_name'] = person.full_name
-    html_template = loader.get_template('home/peymentreport.html')
-    return HttpResponse(html_template.render(context, request))
-
-
-@login_required(login_url="/login/")
-def sessionreport(request, person_id):
-    context = {'segment': 'sessionreport'}
-    person = Person.objects.get(id=person_id)
-    session = SessionDate.objects.filter(session_person=person_id)
-    context['session'] = session
-    context['full_name'] = person.full_name
-    html_template = loader.get_template('home/sessionreport.html')
-    return HttpResponse(html_template.render(context, request))
-
-
-@login_required(login_url="/login/")
-def absencereport(request, person_id):
-    context = {'segment': 'absencereport'}
-    person = Person.objects.get(id=person_id)
-    absence = AbsenceDate.objects.filter(absent_person=person_id)
-    context['absence'] = absence
-    context['full_name'] = person.full_name
-    html_template = loader.get_template('home/absencereport.html')
-    return HttpResponse(html_template.render(context, request))
-'''
 
 @login_required(login_url="/login/")
 def classlist(request, ccname):
     if request.method == 'POST':
+        print(request.POST)
         for item in request.POST:
             if 'status' in item:
                 person_id = request.POST[item].split("_")[-1]
@@ -161,6 +138,10 @@ def classlist(request, ccname):
                     person = Person.objects.get(id=person_id)
                     AbsenceDate.objects.create(
                         absent_person=person, doa=jdatetime.datetime.now())
+            elif "trainer" in item:   
+                trainer_id = request.POST[item].split("_")[-1]
+                trainer=Trainer.objects.get(id=trainer_id)
+                TrainerSeesion.objects.create(session_trainer=trainer, dos_trainer=jdatetime.datetime.now(),class_trainer=ccname)
     context = {'segment': 'classlist'}
     person = []
     for obj in Person.objects.all():
@@ -217,6 +198,52 @@ def personalreport(request, person_id):
         html_template = loader.get_template('home/page-404.html')
         return HttpResponse(html_template.render(context, request))
 
+
+@login_required(login_url="/login/")
+def trainerreport(request, trainer_id):
+    if  request.user.is_admin:
+        trainer = Trainer.objects.get(id=trainer_id)
+        print(trainer)
+        context = {'segment': 'trainerreport'}
+        context['trainer'] = trainer
+
+        html_template = loader.get_template('home/trainerreport.html')
+        return HttpResponse(html_template.render(context, request))
+    else:
+        context = {}
+        html_template = loader.get_template('home/page-404.html')
+        return HttpResponse(html_template.render(context, request))
+
+
+@login_required(login_url="/login/")
+def trainerslist(request):
+        colorbg=[
+        "bg-red",
+        "bg-yellow",
+        "bg-aqua",
+        "bg-blue",
+        "bg-light-blue",
+        "bg-green",
+        "bg-navy",
+        "bg-teal",
+        "bg-olive",
+        "bg-lime",
+        "bg-orange",
+        "bg-fuchsia",
+        ]
+        
+        trainers = Trainer.objects.all()
+        context = {'segment': 'trainerslist'}
+        context['trainers'] = trainers
+        context['colorbg'] = colorbg
+        context['1'] = "bg-red"
+        context['2'] = "bg-yellow"
+        context['3'] = "bg-aqua"
+        context['4'] = "bg-green"
+
+        html_template = loader.get_template('home/trainerslist.html')
+        return HttpResponse(html_template.render(context, request))
+    
 
 @login_required(login_url="/login/")
 def pages(request):

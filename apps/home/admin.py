@@ -95,12 +95,14 @@ def SessionAction(instance, **kwarg):
     current_value = list(person_obj.values())[0]['rsession']
     person_obj.update(rsession=current_value-1)
 
-
+'''
 @receiver(post_save, sender=Person)
-def PersonAction(instance, **kwarg):
-    person_obj = Person.objects.filter(
-        username__contains=str(instance.username).split(" ")[0])
-    print(list(person_obj.values()))
-    # person_obj.object.save()
-    # person_obj.update(password=person_obj.set_password(person_obj["password"]))
-    person_obj.update()
+def hash_user_password(sender, instance, created, **kwargs):
+    if created:
+        # New user created, hash the password
+        instance.set_password(instance.password)
+        instance.save()
+
+
+post_save.connect(hash_user_password, sender=Person)
+'''

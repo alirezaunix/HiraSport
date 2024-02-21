@@ -1,12 +1,12 @@
 # -*- encoding: utf-8 -*-
-# TODO: one to one
 from email.policy import default
 from tabnanny import verbose
+from typing import Any
 from django.db import models
 from django.contrib.auth.models import User
 from django_jalali.db import models as jmodels
 from multiselectfield import MultiSelectField
-from django.contrib.auth.models import AbstractUser, AbstractBaseUser, BaseUserManager, UserManager
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 
 
 class SportField(models.Model):
@@ -22,12 +22,21 @@ class SportField(models.Model):
 
 
 class Trainer(models.Model):
+    gender_choice = ('m', 'مرد'), ('f', 'زن')
     id = models.AutoField(primary_key=True, verbose_name='ردیف')
     tsport = models.ForeignKey(
         SportField, on_delete=models.CASCADE, verbose_name='رشته ', blank=True, null=True)
     tfull_name = models.CharField(
         max_length=30, verbose_name="نام و نام خانوادگی")
     tphone = models.CharField(max_length=20, verbose_name="شماره تلفن ")
+    edu=models.CharField(max_length=50, verbose_name="میزان تحصیلات",blank=True)
+    exp=models.CharField(max_length=50,verbose_name="سوابق تجربی",blank=True)
+    shortdesc = models.CharField(
+        max_length=50, verbose_name="توضیح کوتاه ", blank=True)
+    timage = models.ImageField(verbose_name="عکس ", blank=True, null=True)
+    gender = models.CharField(
+        max_length=1, verbose_name="جنسیت", choices=gender_choice,blank=True)
+    dob = jmodels.jDateField(verbose_name="تاریخ تولد", null=True)
 
     class Meta:
         verbose_name = "مربی"
@@ -36,6 +45,18 @@ class Trainer(models.Model):
     def __str__(self):
         return self.tfull_name
 
+class TrainerSeesion(models.Model):
+    id = models.AutoField(primary_key=True, verbose_name='ردیف')
+    session_trainer=models.ForeignKey(Trainer,on_delete=models.CASCADE,verbose_name="نام مربی")
+    dos_trainer = jmodels.jDateField(verbose_name="تاریخ جلسات")
+    class_trainer=models.CharField(max_length=20,verbose_name="نام کلاس")
+
+    class Meta:
+        verbose_name="جلسه مربی"
+        verbose_name_plural="جلسات مربی"
+    
+    def __str__(self):
+        return self.session_trainer     
 
 class Classi(models.Model):
     weekdays_list = ('Sat', 'شنبه'), ('Sun', 'یکشنبه'), ('Mon', 'دوشنبه'), (
@@ -54,21 +75,27 @@ class Classi(models.Model):
 
     def __str__(self):
         return self.cname
-
-
+'''
+class MyUserManager(UserManager):
+    def create_user(self, username: str, email: str | None = ..., password: str | None = ..., **extra_fields: Any) -> Any:
+        
+        return super().create_user(username, email, password, **extra_fields)
+'''
 class MyUserManager(BaseUserManager):
 
-    def create_user(self, username, password=None):
+    def create_user(self, username, password=None,is_admin=False,is_superuser=False):
         print("in create user------>>>>>>")
         user = self.model(username=username)
         user.set_password(password)
-        self.is_hashed = True
+        user.is_admin=is_admin
+        user.is_superuser=is_superuser
         user.save(using=self._db)
         return user
 
     def create_superuser(self,  username, password=None):
         print("in create superuser------>>>>>>")
-
+        return self.create_user(username, password,True,True)
+'''
         user = self.create_user(
             username,
             password=password,
@@ -80,7 +107,7 @@ class MyUserManager(BaseUserManager):
         print(f"{user.is_superuser=:}")
         user.save(using=self._db)
         return user
-
+'''
 
 class Person(AbstractBaseUser):
     gender_choice = ('m', 'مرد'), ('f', 'زن')
@@ -152,13 +179,12 @@ class Person(AbstractBaseUser):
         "Is the user a member of staff?"
         # Simplest possible answer: All admins are staff
         return self.is_admin
-
+    
+    ''''''
     def save(self, *args, **kwargs):
         self.full_name = f"{self.first_name} {self.last_name}"
         if not self.is_hashed:
-            # New user: set the password
             print("in hashing in save method.")
-            #self.set_password(self.password)
         super().save(*args, **kwargs)
 
 

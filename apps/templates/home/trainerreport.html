@@ -1,0 +1,199 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %} Profile {% endblock %} 
+
+<!-- Element injected in the BODY element -->
+{% block body_class %} sidebar-mini {% endblock body_class %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+  <!-- Bootstrap 3.3.7 -->
+  <link rel="stylesheet" href="{{ ASSETS_ROOT }}/dist/css/bootstrap-theme.css">
+  <!-- Bootstrap rtl -->
+  <link rel="stylesheet" href="{{ ASSETS_ROOT }}/dist/css/rtl.css">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="{{ ASSETS_ROOT }}/bower_components/font-awesome/css/font-awesome.min.css">
+  <!-- Ionicons -->
+  <link rel="stylesheet" href="{{ ASSETS_ROOT }}/bower_components/Ionicons/css/ionicons.min.css">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="{{ ASSETS_ROOT }}/dist/css/AdminLTE.css">
+  <!-- AdminLTE Skins. Choose a skin from the css/skins
+       folder instead of downloading all of them to reduce the load. -->
+  <link rel="stylesheet" href="{{ ASSETS_ROOT }}/dist/css/skins/_all-skins.min.css">
+
+{% endblock stylesheets %}
+
+{% block content %}  
+
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        پروفایل {{ trainer.tfull_name }}
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> خانه</a></li>
+        <li><a href="#">مثال ها</a></li>
+        <li class="active"> پروفایل</li>
+      </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+
+      <div class="row">
+        <div class="col-md-3">
+
+          <!-- Profile Image -->
+          <div class="box box-primary">
+            <div class="box-body box-profile">
+               {% if trainer.timage %}
+              <img class="profile-user-img img-responsive img-circle" src="{{trainer.timage.url}}" >
+              {% else %}
+              <img class="profile-user-img img-responsive img-circle" src="{% static 'assets/img' %}/avatar.png"> 
+              {% endif %}
+              <h3 class="profile-username text-center">{{person.first_name }} {{person.last_name}}</h3>
+            </div>
+            <!-- /.box-body -->
+          </div>
+          <!-- /.box -->
+
+          <!-- About Me Box -->
+
+          <div class="box box-primary">
+            <div class="box-header with-border">
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+              
+              
+              <strong> تاریخ تولد</strong>
+              <p class="text-muted">
+                  {{trainer.dob}}
+              </p>
+
+              <hr>
+
+              <strong> جنسیت</strong>
+
+              {% if person.gender == "m" %}                                
+                  <p class="text-muted"> مرد </p>
+              {% else %}
+                    <p class="text-muted"> زن </p>
+              {% endif %}
+
+              <hr>
+              <strong><i class="fa fa-pencil margin-r-5"></i>رشته ورزشی</strong>
+              <p>
+                  {{ trainer.tsport }}
+              </p>
+
+
+            </div>
+            <!-- /.box-body -->
+          </div>
+          
+         
+          <!-- /.box -->
+        </div>
+        <!-- /.col -->
+        <div class="col-md-9">
+          <div class="nav-tabs-custom">
+            <ul class="nav nav-tabs">
+              <li class="active"><a href="#analysis" data-toggle="tab">آنالیز ها</a></li>
+              <li><a href="#sessions" data-toggle="tab">گزارش حضور</a></li>
+              <li><a href="#abcenses" data-toggle="tab">گزارش غیبت</a></li>
+              <li><a href="#peyments" data-toggle="tab">گزارش پرداخت</a></li>
+            </ul>
+            <div class="tab-content">
+              <div class="active tab-pane" id="analysis">
+                <p>tab1</p>
+              </div>
+              <!-- /.tab-pane -->
+              <div class="tab-pane" id="sessions">
+                <div class="box-body table-responsive no-padding">
+                  <table class="table table-hover">
+                                <tr>
+                                    <th>ردیف</th>
+                                    <th>روز حضور</th>
+                                </tr>
+                                {% for s in session%}
+                                <tr>
+                                    <td>{{s.id}}</td>
+                                    <td>{{s.dos}}</td>
+                                </tr>
+                                {%endfor%}
+                  </table>
+                </div>              
+              </div>
+              <!-- /.tab-pane -->
+              <div class="tab-pane" id="abcenses">
+                <div class="box-body table-responsive no-padding">
+                  <table class="table table-hover">
+                                <tr>
+                                    <th>ردیف</th>
+                                    <th>روز غیبت</th>
+                                </tr>
+                                {% for s in absence%}
+                                <tr>
+                                    <td>{{s.id}}</td>
+                                    <td>{{s.doa}}</td>
+                                </tr>
+                                {%endfor%}
+                  </table>
+                </div>              
+
+              </div>
+              <div class="tab-pane" id="peyments">
+                <div class="box-body table-responsive no-padding">
+                  <table class="table table-hover">
+                                <tr>
+                                    <th>ردیف</th>
+                                    <th>روز پرداخت</th>
+                                    <th>مقدار پرداخت</th>
+                                    <th>تعداد جلسات شارژ شده</th>
+                                </tr>
+                                {% for s in peyment%}
+                                <tr>
+                                    <td>{{s.id}}</td>
+                                    <td>{{s.dop}}</td>
+                                    <td>{{s.mcharged}}</td>
+                                    <td>{{s.ncharged}}</td>
+                                </tr>
+                                {%endfor%}
+                  </table>
+                </div>              
+             </div>
+              <!-- /.tab-pane -->
+            </div>
+            <!-- /.tab-content -->
+          </div>
+          <!-- /.nav-tabs-custom -->
+        </div>
+        <!-- /.col -->
+      </div>
+      <!-- /.row -->
+
+    </section>
+    <!-- /.content -->
+  </div>  
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+
+
+<!-- jQuery 3 -->
+<script src="{{ ASSETS_ROOT }}/bower_components/jquery/dist/jquery.min.js"></script>
+<!-- Bootstrap 3.3.7 -->
+<script src="{{ ASSETS_ROOT }}/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<!-- FastClick -->
+<script src="{{ ASSETS_ROOT }}/bower_components/fastclick/lib/fastclick.js"></script>
+<!-- AdminLTE App -->
+<script src="{{ ASSETS_ROOT }}/dist/js/adminlte.min.js"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="{{ ASSETS_ROOT }}/dist/js/demo.js"></script>
+
+{% endblock javascripts %}  
