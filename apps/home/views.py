@@ -37,7 +37,7 @@ class PersonAutocomplete(autocomplete.Select2QuerySetView):
 
 @login_required(login_url="/login/")
 def index(request):
-   if request.user.is_admin:
+   if True:#request.user.is_superuser:
         '''
         print(dir(User))
         
@@ -84,7 +84,7 @@ def todayclasslist(request):
     for objP in Person.objects.all():
         counter = 0
         for item in classesname:
-            if not objP.is_admin:
+            if not objP.is_superuser :
                 print("******",objP.id)
                 if item in objP.classname.cname:
                     counter += 1

@@ -83,18 +83,21 @@ class MyUserManager(UserManager):
 '''
 class MyUserManager(BaseUserManager):
 
-    def create_user(self, username, password=None,is_admin=False,is_superuser=False):
+    def create_user(self, username, password,is_superuser=False ):
         print("in create user------>>>>>>")
-        user = self.model(username=username)
+        user = self.model(username=username, )
         user.set_password(password)
-        user.is_admin=is_admin
-        user.is_superuser=is_superuser
         user.save(using=self._db)
         return user
 
-    def create_superuser(self,  username, password=None):
+    def create_superuser(self,  username, password, ):
         print("in create superuser------>>>>>>")
-        return self.create_user(username, password,True,True)
+        #extra_fields.setdefault("is_staff", True)
+        #extra_fields.setdefault("is_superuser", True)
+        #extra_fields.setdefault("is_admin", True)
+        #extra_fields.setdefault("is_active", True)
+        
+        return self.create_user(username, password,is_superuser=True)
 '''
         user = self.create_user(
             username,
@@ -146,7 +149,8 @@ class Person(AbstractBaseUser):
     email = models.EmailField(verbose_name="ایمیل")
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
-    is_hashed = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
+    is_staff= models.BooleanField(default=False)
 
     USERNAME_FIELD = "username"
 
@@ -173,19 +177,19 @@ class Person(AbstractBaseUser):
     def is_staff(self):
         "Is the user a member of staff?"
         # Simplest possible answer: All admins are staff
-        return self.is_admin
+        return self.is_superuser
 
-    def is_superuser(self):
-        "Is the user a member of staff?"
-        # Simplest possible answer: All admins are staff
-        return self.is_admin
-    
-    ''''''
     def save(self, *args, **kwargs):
         self.full_name = f"{self.first_name} {self.last_name}"
-        if not self.is_hashed:
-            print("in hashing in save method.")
+        # if not self.is_hashed:
+        #    print("in hashing in save method.")
         super().save(*args, **kwargs)
+
+    @property
+    def is_admin(self):
+        "Is the user a member of staff?"
+        # Simplest possible answer: All admins are staff
+        return self.is_superuser
 
 
 class Peyment(models.Model):
