@@ -2,11 +2,12 @@
 
 from django.contrib.auth.models import User
 from django.contrib import admin
-from .models import Person, SportField, Peyment, SessionDate, Classi, Trainer, AbsenceDate,Analysis
+from .models import Person, SportField, Peyment, SessionDate, Classi, Trainer, AbsenceDate,Analysis,TrainerSeesion
 from django.db.models.signals import post_save
 from .forms import PeymentForm, SessionForm, ClassiForm #AnalysisForm
 from django.dispatch import receiver
 from django.contrib.auth.models import User
+import jdatetime
 
 
     
@@ -16,6 +17,13 @@ class TrainerAdmin(admin.ModelAdmin):
     list_display = ['id', 'tsport', 'tfull_name', 'tphone']
     search_field = ['tfull_name']
     list_filter = ['tsport']
+
+
+@admin.register(TrainerSeesion)
+class TrainerSessionAdmin(admin.ModelAdmin):
+    list_display = ['id', 'session_trainer', 'dos_trainer', 'class_trainer']
+    search_field = ['session_trainer']
+    list_filter = ['session_trainer']
 
 
 @admin.register(Person)
@@ -95,14 +103,15 @@ def SessionAction(instance, **kwarg):
     current_value = list(person_obj.values())[0]['rsession']
     person_obj.update(rsession=current_value-1)
 
-'''
 @receiver(post_save, sender=Person)
-def hash_user_password(sender, instance, created, **kwargs):
+def PersonAction( instance, created, **kwargs):
     if created:
+        Analysis.objects.create(analysis_person=instance,
+                                dot=jdatetime.datetime.now())
+        
         # New user created, hash the password
-        instance.set_password(instance.password)
-        instance.save()
+        #instance.set_password(instance.password)
+        #instance.save()
 
 
-post_save.connect(hash_user_password, sender=Person)
-'''
+#post_save.connect(hash_user_password, sender=Person)

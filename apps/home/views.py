@@ -37,7 +37,7 @@ class PersonAutocomplete(autocomplete.Select2QuerySetView):
 
 @login_required(login_url="/login/")
 def index(request):
-   if True:#request.user.is_superuser:
+   if request.user.is_superuser:
         '''
         print(dir(User))
         
@@ -54,7 +54,7 @@ def index(request):
    else:
        person = Person.objects.get(username=request.user.username)
        # personalreport(request, person.id)
-       print(">>>>", person.id)
+       #print(">>>>", person.id)
        return HttpResponseRedirect(f'personalreport/{person.id}')
 
 
@@ -160,7 +160,7 @@ def classlist(request, ccname):
 
 @login_required(login_url="/login/")
 def personalreport(request, person_id):
-    if str(request.user.username) == Person.objects.get(id=person_id).username or request.user.is_admin:
+    if str(request.user.username) == Person.objects.get(id=person_id).username or request.user.is_superuser:
         person_id = (request.path.split('/')[-1])
         if request.method == 'POST':
             person = Person.objects.get(id=person_id)
@@ -173,13 +173,13 @@ def personalreport(request, person_id):
         lastanalysis = str(analysisperson.dot).split("-")
 
         context = {'segment': 'personalreport'}
-        context['nextanalysis'] = f"{lastanalysis[0]}-{int(lastanalysis[1])+1}-{lastanalysis[2]}"
+        context['nextanalysis'] = f"{lastanalysis[0]}-{(int(lastanalysis[1])+1)%12}-{lastanalysis[2]}"
 
         context['person'] = person
         context['imglen'] = len(person.simage.name)
         l1 = str(person.insurancedate).split("-")
         context['nextinsurance']=f"{int(l1[0])+1}-{l1[1]}-{l1[2]}"
-        context['buttonShow'] = True if request.user.is_admin else False
+        context['buttonShow'] = True if request.user.is_superuser else False
         
         session = SessionDate.objects.filter(session_person=person_id)
         context['session'] = session
@@ -189,7 +189,10 @@ def personalreport(request, person_id):
 
         peyment = Peyment.objects.filter(peyment_person=person_id)
         context['peyment'] = peyment
-
+        
+        print(person.classname.tname)
+        # person.classname , classi.tname
+        #trainername=Trainer.objects.filter()
 
         html_template = loader.get_template('home/personalreport.html')
         return HttpResponse(html_template.render(context, request))
@@ -201,19 +204,27 @@ def personalreport(request, person_id):
 
 @login_required(login_url="/login/")
 def trainerreport(request, trainer_id):
-    if  request.user.is_admin:
+        count=0
         trainer = Trainer.objects.get(id=trainer_id)
-        print(trainer)
+        trainerseesion = TrainerSeesion.objects.filter(session_trainer=trainer_id)
+        mont=(str(jdatetime.datetime.now()).split("-")[1])     
+        for item in trainerseesion:
+            if f"-{mont}-" in str(item.dos_trainer):
+                count+=1
         context = {'segment': 'trainerreport'}
         context['trainer'] = trainer
-
+        context['trainerseesion'] = trainerseesion
+        context['mont']=mont
+        context['count']=count
+        context['superuserview'] = True if request.user.is_superuser else False
         html_template = loader.get_template('home/trainerreport.html')
         return HttpResponse(html_template.render(context, request))
+'''
     else:
         context = {}
         html_template = loader.get_template('home/page-404.html')
         return HttpResponse(html_template.render(context, request))
-
+'''
 
 @login_required(login_url="/login/")
 def trainerslist(request):

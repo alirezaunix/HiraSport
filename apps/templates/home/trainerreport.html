@@ -101,16 +101,36 @@
         <div class="col-md-9">
           <div class="nav-tabs-custom">
             <ul class="nav nav-tabs">
-              <li class="active"><a href="#analysis" data-toggle="tab">آنالیز ها</a></li>
+              <li class="active"><a href="#brief" data-toggle="tab">مشخصات </a></li>
+              {% if superuserview %}
+              <li><a href="#summary" data-toggle="tab">مجموع حضور </a></li>
               <li><a href="#sessions" data-toggle="tab">گزارش حضور</a></li>
-              <li><a href="#abcenses" data-toggle="tab">گزارش غیبت</a></li>
               <li><a href="#peyments" data-toggle="tab">گزارش پرداخت</a></li>
+              {% endif %}
             </ul>
             <div class="tab-content">
-              <div class="active tab-pane" id="analysis">
-                <p>tab1</p>
+              <div class="active tab-pane" id="brief">
+              
+                <hr>
+              <strong><i class="fa fa-university margin-r-5"></i>تحصیلات  </strong>
+              <p>
+                  {{ trainer.edu }}
+              </p>
+
+              <hr>
+              <strong><i class="fa fa-certificate margin-r-5"></i>سوابق  </strong>
+              <p>
+                  {{ trainer.exp }}
+              </p>
+
+              
+            </div>
+              <!-- /.tab-pane -->
+              <div class=" tab-pane" id="summary">
+                <p>تا کنون در ماه {{mont}} تعداد جلسات: {{count }}</p>
               </div>
               <!-- /.tab-pane -->
+
               <div class="tab-pane" id="sessions">
                 <div class="box-body table-responsive no-padding">
                   <table class="table table-hover">
@@ -118,33 +138,16 @@
                                     <th>ردیف</th>
                                     <th>روز حضور</th>
                                 </tr>
-                                {% for s in session%}
+                                {% for s in trainerseesion%}
                                 <tr>
                                     <td>{{s.id}}</td>
-                                    <td>{{s.dos}}</td>
+                                    <td>{{s.dos_trainer}}</td>
                                 </tr>
                                 {%endfor%}
                   </table>
                 </div>              
               </div>
               <!-- /.tab-pane -->
-              <div class="tab-pane" id="abcenses">
-                <div class="box-body table-responsive no-padding">
-                  <table class="table table-hover">
-                                <tr>
-                                    <th>ردیف</th>
-                                    <th>روز غیبت</th>
-                                </tr>
-                                {% for s in absence%}
-                                <tr>
-                                    <td>{{s.id}}</td>
-                                    <td>{{s.doa}}</td>
-                                </tr>
-                                {%endfor%}
-                  </table>
-                </div>              
-
-              </div>
               <div class="tab-pane" id="peyments">
                 <div class="box-body table-responsive no-padding">
                   <table class="table table-hover">
