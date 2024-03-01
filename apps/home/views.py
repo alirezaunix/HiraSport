@@ -169,11 +169,14 @@ def personalreport(request, person_id):
         
         person = Person.objects.get(id=person_id)
 
-        analysisperson = Analysis.objects.get(analysis_person=person_id)
+        analysisperson = Analysis.objects.filter(analysis_person=person_id).latest('dot')
         lastanalysis = str(analysisperson.dot).split("-")
-
+        monti=int(lastanalysis[1])+1
+        if monti>12:
+            yeari=int(lastanalysis[0])+1
+            monti=monti%12
         context = {'segment': 'personalreport'}
-        context['nextanalysis'] = f"{lastanalysis[0]}-{(int(lastanalysis[1])+1)%12}-{lastanalysis[2]}"
+        context['nextanalysis'] = f"{yeari}-{monti}-{lastanalysis[2]}"
 
         context['person'] = person
         context['imglen'] = len(person.simage.name)
@@ -189,6 +192,9 @@ def personalreport(request, person_id):
 
         peyment = Peyment.objects.filter(peyment_person=person_id)
         context['peyment'] = peyment
+        
+        analysis=Analysis.objects.filter(analysis_person=person_id)
+        context["analysis"] = analysis
         
         print(person.classname.tname)
         # person.classname , classi.tname

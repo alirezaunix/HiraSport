@@ -228,6 +228,15 @@ class Analysis (models.Model):
     current_state_bfm = models.FloatField(verbose_name="وضعیت موجود - توده چربی", default=0)
     current_state_smm = models.FloatField(verbose_name="وضعیت موجود - عضله ", default=0)
     current_state_pbf = models.FloatField(verbose_name="وضعیت موجود - درصد چربی", default=0)
+    
+    diffrence_weight = models.FloatField(verbose_name="وضعیت موجود - وزن",default=0,editable=False)
+    diffrence_bfm = models.FloatField(
+        verbose_name="وضعیت موجود - توده چربی", default=0, editable=False)
+    diffrence_smm = models.FloatField(
+        verbose_name="وضعیت موجود - عضله ", default=0, editable=False)
+    diffrence_pbf = models.FloatField(
+        verbose_name="وضعیت موجود - درصد چربی", default=0, editable=False)
+    
     point_state_weight = models.FloatField(verbose_name="هدف مقطعی - وزن", default=0)
     point_state_bfm = models.FloatField(verbose_name="هدف مقطعی - توده چربی", default=0)
     point_state_smm = models.FloatField(verbose_name="هدف مقطعی - عضله ", default=0)

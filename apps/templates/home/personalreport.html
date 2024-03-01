@@ -137,8 +137,54 @@
             </ul>
             <div class="tab-content">
               <div class="active tab-pane" id="analysis">
-                <p>tab1</p>
-              </div>
+              <div class="box-body table-responsive no-padding text-center">
+                  <table class="table table-hover table-striped table-bordered">
+                                  <tr>
+                                    <th class="text-center">تاریخ</th>
+                                    <th class="text-center" colspan=4>وضعیت موجود</th>
+                                    <th class="text-center border-right" colspan=4>تغییرات</th>
+                                    <th class="text-center" colspan=4>هدف مقطعی</th>
+                                </tr>
+            
+                                <tr>
+                                    <th></th>
+                                    <th class="text-center">وزن</th>
+                                    <th class="text-center">توده<br>چربی</th>
+                                    <th class="text-center">عضله</th>
+                                    <th class="text-center"> درصد<br>چربی</th>
+                                    <th class="text-center">وزن</th>
+                                    <th class="text-center">توده<br>چربی</th>
+                                    <th class="text-center">عضله</th>
+                                    <th class="text-center"> درصد<br>چربی</th>
+                                    <th class="text-center">وزن</th>
+                                    <th class="text-center">توده<br>چربی</th>
+                                    <th class="text-center">عضله</th>
+                                    <th class="text-center"> درصد<br>چربی</th>
+                                </tr>
+                                {% for s in analysis%}
+                                <tr>
+                                    <td>{{s.dot}}</td>
+                                    <td>{{s.current_state_weight}}</td>
+                                    <td>{{s.current_state_bfm}}</td>
+                                    <td>{{s.current_state_smm}}</td>
+                                    <td>{{s.current_state_pbf}}</td>
+                                   
+                                    <td >
+                                    {% if s.diffrence_weight > 0 %}   <small style="font-size: 100%;  max-width: 75%;  label.padding: 0.4em 0.6em 0.3em;" class=" bg-green">{{s.diffrence_weight}}</small> {% else %}<small style="font-size: 100%;" class="bg-red">{{s.diffrence_weight}}</small>{% endif %}</td>
+                                    </td>
+                                    <td>{{s.diffrence_bfm}}</td>
+                                    <td>{{s.diffrence_smm}}</td>
+                                    <td>{{s.diffrence_pbf}}</td>
+                                    
+                                    <td>{{s.point_state_weight}}</td>
+                                    <td>{{s.point_state_bfm}}</td>
+                                    <td>{{s.point_state_smm}}</td>
+                                    <td>{{s.point_state_pbf}}</td>
+
+                                </tr>
+                                {%endfor%}
+                  </table>
+                </div>                      </div>
               <!-- /.tab-pane -->
               <div class="tab-pane" id="sessions">
                 <div class="box-body table-responsive no-padding">
@@ -172,7 +218,6 @@
                                 {%endfor%}
                   </table>
                 </div>              
-
               </div>
               <div class="tab-pane" id="peyments">
                 <div class="box-body table-responsive no-padding">

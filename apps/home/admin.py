@@ -108,10 +108,16 @@ def PersonAction( instance, created, **kwargs):
     if created:
         Analysis.objects.create(analysis_person=instance,
                                 dot=jdatetime.datetime.now())
-        
-        # New user created, hash the password
-        #instance.set_password(instance.password)
-        #instance.save()
 
 
-#post_save.connect(hash_user_password, sender=Person)
+@receiver(post_save, sender=Analysis)
+def AnalysysAction( instance, created, **kwargs):
+    if created:
+        previous_record = Analysis.objects.filter(
+            pk__lt=instance.pk , analysis_person= instance.analysis_person).latest('pk')
+        Analysis.objects.filter(id=instance.pk).update(
+            diffrence_weight = instance.current_state_weight-previous_record.current_state_weight,
+            diffrence_bfm=instance.current_state_bfm-previous_record.current_state_bfm,
+            diffrence_smm=instance.current_state_smm-previous_record.current_state_smm,
+            diffrence_pbf=instance.current_state_pbf-previous_record.current_state_pbf,
+        )
