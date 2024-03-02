@@ -196,9 +196,42 @@ def personalreport(request, person_id):
         analysis=Analysis.objects.filter(analysis_person=person_id)
         context["analysis"] = analysis
         
-        print(person.classname.tname)
-        # person.classname , classi.tname
-        #trainername=Trainer.objects.filter()
+###############################
+        very_distracting_data = [
+        { "label": "Sunday", "y": 2.4 },
+        { "label": "Monday", "y": .6 },
+        { "label": "Tuesday", "y": .8 },
+        { "label": "Wednesday", "y": 1.6 },
+        { "label": "Thursday", "y": 1.4 },
+        { "label": "Friday", "y": 1.4 },
+        { "label": "Saturday", "y": 2.6 }
+    ]
+
+        distracting_data = [
+        { "label": "Sunday", "y": 3.3 },
+        { "label": "Monday", "y": 1.6 },
+        { "label": "Tuesday", "y": 2.1 },
+        { "label": "Wednesday", "y": 1.6 },
+        { "label": "Thursday", "y": 1.4 },
+        { "label": "Friday", "y": 1.7 },
+        { "label": "Saturday", "y": 4.6 }
+    ]
+
+        productive_data = [
+        { "label": "Sunday", "y": 2.4 },
+        { "label": "Monday", "y":  2 },
+        { "label": "Tuesday", "y": 2.8 },
+        { "label": "Wednesday", "y": 1.6 },
+        { "label": "Thursday", "y": 1.4 },
+        { "label": "Friday", "y": 1.4 },
+        { "label": "Saturday", "y": 1.6 }
+    ]
+
+        
+        context.update({"very_distracting_data": very_distracting_data, "distracting_data": distracting_data,
+                       "productive_data": productive_data, })
+###############################
+
 
         html_template = loader.get_template('home/personalreport.html')
         return HttpResponse(html_template.render(context, request))

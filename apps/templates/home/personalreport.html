@@ -131,13 +131,14 @@
           <div class="nav-tabs-custom">
             <ul class="nav nav-tabs">
               <li class="active"><a href="#analysis" data-toggle="tab">آنالیز ها</a></li>
+              <li><a href="#charts" data-toggle="tab">نمودار</a></li>
               <li><a href="#sessions" data-toggle="tab">گزارش حضور</a></li>
               <li><a href="#abcenses" data-toggle="tab">گزارش غیبت</a></li>
               <li><a href="#peyments" data-toggle="tab">گزارش پرداخت</a></li>
             </ul>
             <div class="tab-content">
               <div class="active tab-pane" id="analysis">
-              <div class="box-body table-responsive no-padding text-center">
+                <div class="box-body table-responsive no-padding text-center">
                   <table class="table table-hover table-striped table-bordered">
                                   <tr>
                                     <th class="text-center">تاریخ</th>
@@ -184,8 +185,16 @@
                                 </tr>
                                 {%endfor%}
                   </table>
-                </div>                      </div>
+                  </div>
+     
+                </div>
               <!-- /.tab-pane -->
+              <div class="tab-pane" id="charts">
+                <div class="box-body  no-padding">
+                                     <div id="chartContainer"></div>
+
+                </div>              
+              </div>
               <div class="tab-pane" id="sessions">
                 <div class="box-body table-responsive no-padding">
                   <table class="table table-hover">
@@ -245,6 +254,8 @@
           </div>
           <!-- /.nav-tabs-custom -->
         </div>
+
+
         <!-- /.col -->
       </div>
       <!-- /.row -->
@@ -269,5 +280,58 @@
 <script src="{{ ASSETS_ROOT }}/dist/js/adminlte.min.js"></script>
 <!-- AdminLTE for demo purposes -->
 <script src="{{ ASSETS_ROOT }}/dist/js/demo.js"></script>
+<script src="{{ ASSETS_ROOT }}/dist/js/canvasjs.min.js"></script>
+
+<script>
+  window.onload = function () {
+    var chart = new CanvasJS.Chart("chartContainer", {
+      title: {
+        text: "نمودار ماهانه"             
+      },
+      animationEnabled: true,
+      axisY: {
+        title: "کیلو"
+      },
+      toolTip: {
+        shared: true
+      },
+      legend: {
+        cursor: "pointer",
+        itemclick: function(e) {
+          if (typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+            e.dataSeries.visible = false;
+          }
+          else {
+            e.dataSeries.visible = true;
+          }
+          chart.render();
+        }
+      },
+      data: [{
+        type: "stackedArea",
+        name: "وزن",
+        showInLegend: true,
+        yValueFormatString: "0.#کیلو",
+        markerSize: 0,
+        dataPoints: {{ very_distracting_data|safe }}
+      },{
+        type: "stackedArea",        
+        name: "توده چربی",
+        showInLegend: true,
+        yValueFormatString: "0.#کیلو",
+        markerSize: 0,
+        dataPoints: {{ distracting_data|safe }}
+      },{
+        type: "stackedArea",
+        name: "عضله",
+        showInLegend: true,
+        yValueFormatString: "0.#کیلو",
+        markerSize: 0,
+        dataPoints: {{ productive_data|safe }}
+      },]
+    });
+    chart.render();
+  }
+</script>
 
 {% endblock javascripts %}  
