@@ -193,45 +193,23 @@ def personalreport(request, person_id):
         peyment = Peyment.objects.filter(peyment_person=person_id)
         context['peyment'] = peyment
         
-        analysis=Analysis.objects.filter(analysis_person=person_id)
+        analysis=Analysis.objects.filter(analysis_person=person_id)       
         context["analysis"] = analysis
         
-###############################
-        very_distracting_data = [
-        { "label": "Sunday", "y": 2.4 },
-        { "label": "Monday", "y": .6 },
-        { "label": "Tuesday", "y": .8 },
-        { "label": "Wednesday", "y": 1.6 },
-        { "label": "Thursday", "y": 1.4 },
-        { "label": "Friday", "y": 1.4 },
-        { "label": "Saturday", "y": 2.6 }
-    ]
-
-        distracting_data = [
-        { "label": "Sunday", "y": 3.3 },
-        { "label": "Monday", "y": 1.6 },
-        { "label": "Tuesday", "y": 2.1 },
-        { "label": "Wednesday", "y": 1.6 },
-        { "label": "Thursday", "y": 1.4 },
-        { "label": "Friday", "y": 1.7 },
-        { "label": "Saturday", "y": 4.6 }
-    ]
-
-        productive_data = [
-        { "label": "Sunday", "y": 2.4 },
-        { "label": "Monday", "y":  2 },
-        { "label": "Tuesday", "y": 2.8 },
-        { "label": "Wednesday", "y": 1.6 },
-        { "label": "Thursday", "y": 1.4 },
-        { "label": "Friday", "y": 1.4 },
-        { "label": "Saturday", "y": 1.6 }
-    ]
-
+        weight=[]
+        bfm=[]
+        smm=[]
         
-        context.update({"very_distracting_data": very_distracting_data, "distracting_data": distracting_data,
-                       "productive_data": productive_data, })
+        for ana in analysis:
+            weight.append({"label": ana.dot.strftime("%Y-%m-%d"), "y": ana.current_state_weight})
+            bfm.append({"label": ana.dot.strftime(
+                "%Y-%m-%d"), "y": ana.current_state_bfm})
+            smm.append({"label": ana.dot.strftime(
+                "%Y-%m-%d"), "y": ana.current_state_bfm})
+        
+        context.update({"weight": weight, "bfm": bfm,
+                       "smm": smm, })
 ###############################
-
 
         html_template = loader.get_template('home/personalreport.html')
         return HttpResponse(html_template.render(context, request))

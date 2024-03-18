@@ -69,12 +69,7 @@ class Classi(models.Model):
 
     def __str__(self):
         return self.cname
-'''
-class MyUserManager(UserManager):
-    def create_user(self, username: str, email: str | None = ..., password: str | None = ..., **extra_fields: Any) -> Any:
-        
-        return super().create_user(username, email, password, **extra_fields)
-'''
+
 class MyUserManager(BaseUserManager):
 
     def create_user(self, username, password,is_superuser=False ):
@@ -113,7 +108,7 @@ class Person(AbstractBaseUser):
     last_name = models.CharField(max_length=30, verbose_name="نام خانوادگی")
     full_name = models.CharField(max_length=50, blank=True, editable=False)
     ncode = models.CharField(max_length=11, verbose_name="کدملی")
-    scode = models.CharField(max_length=10, verbose_name="کدبیمه ورزشی")
+    scode = models.CharField(max_length=10, verbose_name="کدبیمه ورزشی",blank=True)
     insurancedate = jmodels.jDateField(verbose_name="تاریخ ثبت بیمه ورزشی", null=True)
     shistory = models.TextField(verbose_name="سابقه ورزشی", blank=True)
     hhistory = models.TextField(verbose_name="سابقه پزشکی", blank=True)
@@ -122,8 +117,9 @@ class Person(AbstractBaseUser):
     # dor = jmodels.jDateField(verbose_name="تاریخ ثبت نام اولیه",null=True)
     sfield = models.ForeignKey(SportField, on_delete=models.CASCADE, null=True, blank=True, default=None, verbose_name="رشته ورزشی")
     classname = models.ForeignKey(Classi, on_delete=models.CASCADE, null=True, blank=True, default=None, verbose_name="کلاس")
-    phone1 = models.CharField(max_length=20, verbose_name="شماره تلفن اول", null=True)
-    phone2 = models.CharField(max_length=20, verbose_name="شماره تلفن دوم", null=True)
+    phone1 = models.CharField(max_length=20, verbose_name="شماره تلفن اول", blank=True)
+    phone2 = models.CharField(
+        max_length=20, verbose_name="شماره تلفن دوم", blank=True)
     address = models.TextField(verbose_name="آدرس", blank=True, null=True)
     created_time = jmodels.jDateField(auto_now_add=True)
     updated_time = jmodels.jDateField(auto_now=True)
@@ -131,8 +127,8 @@ class Person(AbstractBaseUser):
     rsession = models.IntegerField(verbose_name="تعداد جلسات باقی مانده", default=0)
     username = models.CharField(max_length=20, verbose_name="نام کاربری", unique=True)
     password = models.CharField(max_length=20, verbose_name="گذر واژه", blank=True)
-    email = models.EmailField(verbose_name="ایمیل")
-    is_active = models.BooleanField(default=True)
+    email = models.EmailField(verbose_name="ایمیل",blank=True)
+    is_active = models.BooleanField(default=True,verbose_name="فعال")
     is_admin = models.BooleanField(default=False,editable=False)
     is_superuser = models.BooleanField(default=False,editable=False)
     is_staff = models.BooleanField(default=False, editable=False)
@@ -242,9 +238,12 @@ class Analysis (models.Model):
     point_state_smm = models.FloatField(verbose_name="هدف مقطعی - عضله ", default=0)
     point_state_pbf = models.FloatField(verbose_name="هدف مقطعی - درصد چربی", default=0)
 
+    reportfile=models.FileField(verbose_name="فایل آنالیز",null=True, default="''",blank=True)
+    reportfile_len=models.IntegerField(editable=False,default=0)
     class Meta:
         verbose_name = "آنالیز"
         verbose_name_plural = "آنالیزها"
 
     def __str__(self):
         return  f"{self.analysis_person} {self.dot}"
+    

@@ -164,7 +164,15 @@
                                 </tr>
                                 {% for s in analysis%}
                                 <tr>
-                                    <td>{{s.dot}}</td>
+                                    
+                                    {% if s.reportfile|length > 0  %}
+                                        <td>{{s.dot}} <a href="{{ s.reportfile.url }}" target="_blank" title="Download"><i class="fa fa-download" aria-hidden="true"></i></a></td>
+                                    {% else %}
+                                        <td>{{s.dot}}</td>
+                                    {% endif %}
+
+
+
                                     <td>{{s.current_state_weight}}</td>
                                     <td>{{s.current_state_bfm}}</td>
                                     <td>{{s.current_state_smm}}</td>
@@ -173,9 +181,17 @@
                                     <td >
                                     {% if s.diffrence_weight > 0 %}   <small style="font-size: 100%;  max-width: 75%;  label.padding: 0.4em 0.6em 0.3em;" class=" bg-green">{{s.diffrence_weight}}</small> {% else %}<small style="font-size: 100%;" class="bg-red">{{s.diffrence_weight}}</small>{% endif %}</td>
                                     </td>
-                                    <td>{{s.diffrence_bfm}}</td>
-                                    <td>{{s.diffrence_smm}}</td>
-                                    <td>{{s.diffrence_pbf}}</td>
+                                    
+                                    <td >
+                                    {% if s.diffrence_bfm > 0 %}   <small style="font-size: 100%;  max-width: 75%;  label.padding: 0.4em 0.6em 0.3em;" class=" bg-green">{{s.diffrence_bfm}}</small> {% else %}<small style="font-size: 100%;" class="bg-red">{{s.diffrence_bfm}}</small>{% endif %}</td>
+                                    </td>
+                                    
+                                    <td >
+                                    {% if s.diffrence_smm > 0 %}   <small style="font-size: 100%;  max-width: 75%;  label.padding: 0.4em 0.6em 0.3em;" class=" bg-green">{{s.diffrence_smm}}</small> {% else %}<small style="font-size: 100%;" class="bg-red">{{s.diffrence_smm}}</small>{% endif %}</td>
+                                    </td>
+
+                                    <td >
+                                    {% if s.diffrence_pbf > 0 %}   <small style="font-size: 100%;  max-width: 75%;  label.padding: 0.4em 0.6em 0.3em;" class=" bg-green">{{s.diffrence_pbf}}</small> {% else %}<small style="font-size: 100%;" class="bg-red">{{s.diffrence_pbf}}</small>{% endif %}</td>
                                     
                                     <td>{{s.point_state_weight}}</td>
                                     <td>{{s.point_state_bfm}}</td>
@@ -190,10 +206,14 @@
                 </div>
               <!-- /.tab-pane -->
               <div class="tab-pane" id="charts">
+                <div class="card" class="card w-75">
+                    <div class="card-body">
                 <div class="box-body  no-padding">
-                                     <div id="chartContainer"></div>
+                  <div id="chartContainer"></div>
+                </div>
+                </div>
 
-                </div>              
+              </div>
               </div>
               <div class="tab-pane" id="sessions">
                 <div class="box-body table-responsive no-padding">
@@ -290,7 +310,7 @@
       },
       animationEnabled: true,
       axisY: {
-        title: "کیلو"
+        title: ""
       },
       toolTip: {
         shared: true
@@ -313,21 +333,21 @@
         showInLegend: true,
         yValueFormatString: "0.#کیلو",
         markerSize: 0,
-        dataPoints: {{ very_distracting_data|safe }}
+        dataPoints: {{ weight|safe }}
       },{
         type: "stackedArea",        
         name: "توده چربی",
         showInLegend: true,
         yValueFormatString: "0.#کیلو",
         markerSize: 0,
-        dataPoints: {{ distracting_data|safe }}
+        dataPoints: {{ bfm|safe }}
       },{
         type: "stackedArea",
         name: "عضله",
         showInLegend: true,
         yValueFormatString: "0.#کیلو",
         markerSize: 0,
-        dataPoints: {{ productive_data|safe }}
+        dataPoints: {{ smm|safe }}
       },]
     });
     chart.render();
