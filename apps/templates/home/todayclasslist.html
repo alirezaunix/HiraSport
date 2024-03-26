@@ -79,7 +79,6 @@
               <table class="table table-hover">
                  <tr>
                                 <th style="text-align: right;">کلاس</th>
-                                <th style="text-align: right;">مربی</th>
                                 <th style="text-align: right;">ساعت شروع</th>
                                 <th style="text-align: right;">نفرات</th>
 
@@ -87,7 +86,6 @@
                             {% for row in row_data %}
                             <tr>
                                 <td align="right">{{row.classesname}}</td>
-                                <td align="right">{{row.classtrainer}}</td>
                                 <td align="right">{{row.classesstarttime}}</td>
                                 <td align="right"><a href="/classlist/{{row.classesname}}"><button type="submit"  class="btn  btn-xs  bg-maroon btn-flat ">لیست نفرات </button></a></td>
                             </tr>

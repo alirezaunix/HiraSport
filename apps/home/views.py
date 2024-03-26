@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 from django.urls import reverse
-from .models import Person, Classi, SessionDate, Peyment, AbsenceDate, Analysis,Trainer,TrainerSeesion
+from .models import Person, Classi, SessionDate, Peyment, AbsenceDate, Analysis
 from dal import autocomplete
 import jdatetime
 from django.conf.urls.static import static
@@ -47,7 +47,7 @@ def index(request):
         print(dir(Person))'''
         context = {'segment': 'index'}
         context['jdate'] = date_maker()
-        person = Person.objects.all()
+        person = Person.objects.filter(role="student")
         context['person'] = person
         html_template = loader.get_template('home/index.html')
         return HttpResponse(html_template.render(context, request))
@@ -78,10 +78,10 @@ def todayclasslist(request):
     for obj in classobj:
         classesname.append(obj[0].cname)
         classesstarttime.append(obj[0].starttime.strftime('%H:%m'))
-        classtrainer.append(obj[0].tname)
+        #classtrainer.append(obj[0].tname)
     personcount = []
 
-    for objP in Person.objects.all():
+    for objP in Person.objects.filter(role='student'):
         counter = 0
         for item in classesname:
             if not objP.is_superuser :
@@ -94,7 +94,7 @@ def todayclasslist(request):
     a_row = {}
     for i in range(len(classesname)):
         a_row['classesname'] = classesname[i]
-        a_row['classtrainer'] = classtrainer[i]
+        #a_row['classtrainer'] = classtrainer[i]
         a_row['classesstarttime'] = classesstarttime[i]
         row_data.append(a_row)
         a_row = {}
@@ -126,32 +126,35 @@ def analyzereport(request):
 @login_required(login_url="/login/")
 def classlist(request, ccname):
     if request.method == 'POST':
+        cname_obj = Classi.objects.get(cname=ccname)
         print(request.POST)
         for item in request.POST:
             if 'status' in item:
+                print("$$$$$$$$$$$",item)
                 person_id = request.POST[item].split("_")[-1]
                 if request.POST[item].split("_")[0] == 'present':
-                    person = Person.objects.get(id=person_id)
+                    person = Person.objects.get(full_name=person_id)
                     SessionDate.objects.create(
-                        session_person=person, dos=jdatetime.datetime.now())
+                        session_person=person, dos=jdatetime.datetime.now() ,classname=cname_obj)
                 elif request.POST[item].split("_")[0] == 'absent':
-                    person = Person.objects.get(id=person_id)
+                    person = Person.objects.get(full_name=person_id)
                     AbsenceDate.objects.create(
-                        absent_person=person, doa=jdatetime.datetime.now())
+                        absent_person=person, doa=jdatetime.datetime.now(),classname=cname_obj)
             elif "trainer" in item:   
-                trainer_id = request.POST[item].split("_")[-1]
-                trainer=Trainer.objects.get(id=trainer_id)
-                TrainerSeesion.objects.create(session_trainer=trainer, dos_trainer=jdatetime.datetime.now(),class_trainer=ccname)
+                fname = request.POST[item].split("_")[-1]
+                trainer=Person.objects.get(full_name=fname)
+                SessionDate.objects.create(
+                    session_person=trainer, dos=jdatetime.datetime.now(), classname=cname_obj)
     context = {'segment': 'classlist'}
     person = []
-    for obj in Person.objects.all():
+    for obj in Person.objects.filter(role='student'):
         if not obj.is_admin:
             if obj.classname.cname == ccname  :
                 person.append(obj)
     context['person'] = person
     context['cname'] = ccname
     trainers=[]
-    for obj in Trainer.objects.all():
+    for obj in Person.objects.filter(role='trainer'):
         trainers.append(obj)
     context['trainers']=trainers
     html_template = loader.get_template('home/classlist.html')
@@ -175,6 +178,8 @@ def personalreport(request, person_id):
         if monti>12:
             yeari=int(lastanalysis[0])+1
             monti=monti%12
+        else:
+            yeari = int(lastanalysis[0])
         context = {'segment': 'personalreport'}
         context['nextanalysis'] = f"{yeari}-{monti}-{lastanalysis[2]}"
 
@@ -196,6 +201,9 @@ def personalreport(request, person_id):
         analysis=Analysis.objects.filter(analysis_person=person_id)       
         context["analysis"] = analysis
         
+        trainername=Person.objects.get(classname=person.classname , role='trainer' )
+        context["trainername"] = trainername
+        print("!!!!!!!!!!!!!!!!",trainername.id)
         weight=[]
         bfm=[]
         smm=[]
@@ -222,8 +230,8 @@ def personalreport(request, person_id):
 @login_required(login_url="/login/")
 def trainerreport(request, trainer_id):
         count=0
-        trainer = Trainer.objects.get(id=trainer_id)
-        trainerseesion = TrainerSeesion.objects.filter(session_trainer=trainer_id)
+        trainer = Person.objects.get(id=trainer_id)
+        trainerseesion = SessionDate.objects.filter(session_person=trainer_id)
         mont=(str(jdatetime.datetime.now()).split("-")[1])     
         for item in trainerseesion:
             if f"-{mont}-" in str(item.dos_trainer):

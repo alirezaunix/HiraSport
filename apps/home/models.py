@@ -32,10 +32,9 @@ class SportField(models.Model):
     def __str__(self):
         return self.sport_field
 
-
+'''
 class Trainer(models.Model):
-    #place = models.OneToOneField(Place, on_delete=models.CASCADE, primary_key=True)
-
+   
     gender_choice = ('m', 'مرد'), ('f', 'زن')
     id = models.AutoField(primary_key=True, verbose_name='ردیف')
     tsport = models.ForeignKey(
@@ -68,8 +67,8 @@ class Trainer(models.Model):
 
     def __str__(self):
         return self.tfull_name
-
-
+'''
+'''
 class TrainerSeesion(models.Model):
     id = models.AutoField(primary_key=True, verbose_name='ردیف')
     session_trainer = models.ForeignKey(
@@ -83,14 +82,14 @@ class TrainerSeesion(models.Model):
 
     def __str__(self):
         return f"{self.session_trainer} {self.dos_trainer}"
-
+'''
 
 class Classi(models.Model):
     weekdays_list = ('Sat', 'شنبه'), ('Sun', 'یکشنبه'), ('Mon', 'دوشنبه'), (
         'Tue', 'سه شنبه'), ('Wed', 'چهارشنبه'), ('Thu', 'پنجشنبه'), ('Fri', 'جمعه')
     id = models.AutoField(primary_key=True, verbose_name='ردیف')
-    tname = models.ForeignKey(Trainer, on_delete=models.CASCADE,
-                              max_length=50, verbose_name='مربی ', blank=True, null=True)
+#    tname = models.ForeignKey(Trainer, on_delete=models.CASCADE,
+#                              max_length=50, verbose_name='مربی ', blank=True, null=True)
     cname = models.CharField(max_length=20, verbose_name="نام کلاس ")
     weekdays = MultiSelectField(
         choices=weekdays_list, max_choices=7, max_length=30)
@@ -117,19 +116,25 @@ class MyUserManager(BaseUserManager):
 
 
 class Person(AbstractBaseUser):
+    ROLE_CHOICES = [
+        ('employee', 'کارمند'),
+        ('trainer', 'مربی'),
+        ('student', 'ورزشکار'),
+    ]
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES,
+                            verbose_name="نوع کاربر", default="student")
+
     gender_choice = ('m', 'مرد'), ('f', 'زن')
     id = models.AutoField(primary_key=True, verbose_name='ردیف')
-    first_name = models.CharField(max_length=20, verbose_name="نام")
-    last_name = models.CharField(max_length=30, verbose_name="نام خانوادگی")
-    full_name = models.CharField(max_length=50, blank=True, editable=False)
-    ncode = models.CharField(max_length=11, verbose_name="کدملی")
+    full_name = models.CharField(max_length=50, blank=True)
+    ncode = models.CharField(max_length=11, verbose_name="کدملی",blank=True)
     scode = models.CharField(
         max_length=10, verbose_name="کدبیمه ورزشی", blank=True)
     insurancedate = jmodels.jDateField(
-        verbose_name="تاریخ ثبت بیمه ورزشی", null=True)
+        verbose_name="تاریخ ثبت بیمه ورزشی", null=True,blank=True)
     shistory = models.TextField(verbose_name="سابقه ورزشی", blank=True)
     hhistory = models.TextField(verbose_name="سابقه پزشکی", blank=True)
-    dob = jmodels.jDateField(verbose_name="تاریخ تولد", null=True)
+    dob = jmodels.jDateField(verbose_name="تاریخ تولد", null=True,blank=True)
     gender = models.CharField(
         max_length=1, verbose_name="جنسیت", choices=gender_choice)
     # dor = jmodels.jDateField(verbose_name="تاریخ ثبت نام اولیه",null=True)
@@ -146,7 +151,7 @@ class Person(AbstractBaseUser):
     updated_time = jmodels.jDateField(auto_now=True)
     simage = models.ImageField(verbose_name="عکس ", blank=True, null=True)
     rsession = models.IntegerField(
-        verbose_name="تعداد جلسات باقی مانده", default=0)
+        verbose_name="تعداد جلسات باقی مانده", default=0,blank=True)
     username = models.CharField(
         max_length=20, verbose_name="نام کاربری", unique=True)
     password = models.CharField(
@@ -158,6 +163,15 @@ class Person(AbstractBaseUser):
     is_staff = models.BooleanField(default=False, editable=False)
     is_trainer = models.BooleanField(default=False, editable=False)
 
+    t_edu = models.CharField(
+        max_length=50, verbose_name="میزان تحصیلات", blank=True)
+    t_exp = models.CharField(
+        max_length=50, verbose_name="سوابق تجربی", blank=True)
+    t_shortdesc = models.CharField(
+        max_length=50, verbose_name="توضیح کوتاه ", blank=True)
+    
+
+
     USERNAME_FIELD = "username"
 
     objects = MyUserManager()
@@ -167,7 +181,7 @@ class Person(AbstractBaseUser):
         verbose_name_plural = "اشخاص"
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name}"
+        return f"{self.full_name}"
 
     def has_module_perms(self, app_label):
         "Does the user have permissions to view the app `app_label`?"
@@ -186,7 +200,7 @@ class Person(AbstractBaseUser):
         return self.is_superuser
 
     def save(self, *args, **kwargs):
-        self.full_name = f"{self.first_name} {self.last_name}"
+        #self.full_name = f"{self.first_name} {self.last_name}"
         if not self.is_superuser:
             self.set_password(self.password)
         super().save(*args, **kwargs)
@@ -221,6 +235,8 @@ class SessionDate(models.Model):
     id = models.AutoField(primary_key=True, verbose_name='ردیف')
     session_person = models.ForeignKey(
         Person, on_delete=models.CASCADE, verbose_name='شخص')
+    classname = models.ForeignKey(
+        Classi, on_delete=models.CASCADE, null=True, blank=True, default=None, verbose_name="کلاس")
     dos = jmodels.jDateField(verbose_name="تاریخ جلسه")
 
     class Meta:
@@ -233,6 +249,8 @@ class SessionDate(models.Model):
 
 class AbsenceDate(models.Model):
     id = models.AutoField(primary_key=True, verbose_name='ردیف')
+    classname = models.ForeignKey(
+        Classi, on_delete=models.CASCADE, null=True, blank=True, default=None, verbose_name="کلاس")
     absent_person = models.ForeignKey(
         Person, on_delete=models.CASCADE, verbose_name='شخص')
     doa = jmodels.jDateField(verbose_name="تاریخ غیبت")

@@ -103,9 +103,9 @@
                                 <td>{{p.classname.cname}}</td>
                             <td>{% if p.rsession < 3 %}   <small style="font-size: 100%;    label.padding: 0.4em 0.6em 0.3em;" class="label pull-right  bg-red">{{p.rsession}}</small> {%elif p.rsession < 6 %}<small style="font-size: 100%;" class="label pull-right bg-yellow">{{p.rsession}}</small>{% else %}<small style="font-size: 100%;" class="label pull-right bg-green">{{p.rsession}}</small>{% endif %}</td>  
                                 <td>
-                                    <input type="radio" id="present" name="status_{{p.id}}" class="flat-red" value="present_{{p.id}}">
+                                    <input type="radio" id="present" name="status_{{p.full_name}}" class="flat-red" value="present_{{p.full_name}}">
                                     <label for="html">حاضر&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>                          
-                                    <input type="radio" id="absent" name="status_{{p.id}}" class="flat-red" value="absent_{{p.id}}">
+                                    <input type="radio" id="absent" name="status_{{p.full_name}}" class="flat-red" value="absent_{{p.full_name}}">
                                     <label for="css">غایب</label>
                                 </td>
                             </tr>
@@ -137,7 +137,7 @@
               <div class="form-group">
                 <select name="trainer_select" class="form-control select2" style="width: 30%;">
                   {% for trainer in trainers %}
-                  <option value="trainer_{{trainer.id}}">{{trainer.tfull_name}}</option>
+                  <option value="trainer_{{trainer.full_name}}">{{trainer.full_name}}</option>
                   {% endfor%}
 
                 </select>

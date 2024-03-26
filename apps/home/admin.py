@@ -2,36 +2,49 @@
 
 from django.contrib.auth.models import User
 from django.contrib import admin
-from .models import Person, SportField, Peyment, SessionDate, Classi, Trainer, AbsenceDate,Analysis,TrainerSeesion
+from .models import Person, SportField, Peyment, SessionDate, Classi, AbsenceDate,Analysis
 from django.db.models.signals import post_save
 from .forms import PeymentForm, SessionForm, ClassiForm #AnalysisForm
 from django.dispatch import receiver
 from django.contrib.auth.models import User
 import jdatetime
+from django import forms
 
 
-    
+
+'''
     
 @admin.register(Trainer)
 class TrainerAdmin(admin.ModelAdmin):
     list_display = ['id', 'tsport', 'tfull_name', 'tphone']
     search_field = ['tfull_name']
     list_filter = ['tsport']
-
-
+'''
+'''
 @admin.register(TrainerSeesion)
 class TrainerSessionAdmin(admin.ModelAdmin):
     list_display = ['id', 'session_trainer', 'dos_trainer', 'class_trainer']
     search_field = ['session_trainer']
     list_filter = ['session_trainer']
-
+'''
 
 @admin.register(Person)
 class PersonAdmin(admin.ModelAdmin):
-    list_display = ['id','first_name', 'last_name', "ncode",  "scode",   "dob",
-                    "gender", "classname", "sfield", "rsession", 'username', 'password']
-    search_fields = ['first_name', 'last_name']
-    list_filter = ['classname', 'gender', 'sfield']
+    #list_display = ['id',  'full_name', "ncode",  "scode",   "dob",
+     #               "gender", "classname", "sfield", "rsession", 'username', 'password']
+    list_display = ['id',  'full_name',  
+                    "gender",  'username', 'password', 'dob', 'simage', 'is_active']
+    search_fields = [ 'full_name']
+    list_filter = ['classname', 'gender', 'sfield','role']
+
+    class Media:
+        js = ('admin.js',)
+
+
+    def formfield_for_choice_field(self, db_field, request, **kwargs):
+        if db_field.name == 'role':
+                kwargs['widget'] = forms.RadioSelect
+        return super().formfield_for_choice_field(db_field, request, **kwargs)
 
 
 @admin.register(SportField)
@@ -90,16 +103,16 @@ def AbsenceAction(instance, **kwargs):
 
 @receiver(post_save, sender=Peyment)
 def PeymentAction(instance, **kwargs):
-    person_obj = Person.objects.filter(first_name__contains=str(instance.peyment_person).split(
-        " ")[0], last_name__contains=str(instance.peyment_person).split(" ")[1])
+    person_obj = Person.objects.filter(full_name__contains=str(instance.peyment_person).split(
+        " ")[0])
     current_value = list(person_obj.values())[0]['rsession']
     person_obj.update(rsession=current_value+instance.ncharged)
 
 
 @receiver(post_save, sender=SessionDate)
 def SessionAction(instance, **kwarg):
-    person_obj = Person.objects.filter(first_name__contains=str(instance.session_person).split(
-        " ")[0], last_name__contains=str(instance.session_person).split(" ")[1])
+    person_obj = Person.objects.filter(full_name__contains=str(instance.session_person).split(
+        " ")[0])
     current_value = list(person_obj.values())[0]['rsession']
     person_obj.update(rsession=current_value-1)
 
