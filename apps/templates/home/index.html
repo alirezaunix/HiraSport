@@ -152,6 +152,7 @@
                   <th> نام</th>
                   <th>کلاس</th>
                   <th>جلسات<br>مانده </th>
+                  <th> آنالیز بعدی</th>
                   <th>جزییات</th>
                 </tr>
                 </thead>
@@ -159,7 +160,8 @@
                         {% for p in person %}
                               <td align="right">{{p.first_name}} {{p.last_name}}</td>
                               <td align="right">{{p.classname}}</td>
-                            <td>{% if p.rsession < 3 %}   <small style="font-size: 100%;    label.padding: 0.4em 0.6em 0.3em;" class="label pull-right  bg-red">{{p.rsession}}</small> {%elif p.rsession < 6 %}<small style="font-size: 100%;" class="label pull-right bg-yellow">{{p.rsession}}</small>{% else %}<small style="font-size: 100%;" class="label pull-right bg-green">{{p.rsession}}</small>{% endif %}</td>  
+                            <td>{% if p.rsession < 3 %}   <small style="font-size: 100%;    label.padding: 0.4em 0.6em 0.3em;" class="label pull-right  bg-red">{{p.rsession}}</small> {%elif p.rsession < 6 %}<small style="font-size: 100%;" class="label pull-right bg-yellow">{{p.rsession}}</small>{% else %}<small style="font-size: 100%;" class="label pull-right bg-green">{{p.rsession}}</small>{% endif %}</td> 
+                            <td></td> 
                               <td align="right"><a href='/personalreport/{{p.id}}'><button type="submit"  class="btn btn-danger">پروفایل</button></a></td>
                             </tr>
                         {% endfor %}
@@ -170,6 +172,7 @@
                   <th> نام</th>
                   <th>کلاس</th>
                   <th>جلسات<br>مانده </th>
+                  <th> آنالیز بعدی</th>
                   <th>جزییات</th>
                 </tr>
                 </tfoot>

@@ -1,108 +1,129 @@
-{% extends "layouts/base-fullscreen.html" %}
+<!DOCTYPE html>
+<html lang="en">
 
-{% block title %} Login {% endblock %} 
+    <head>
 
-<!-- Element injected in the BODY element -->
-{% block body_class %} login-page {% endblock body_class %}
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Hia Sport</title>
 
-<!-- Specific Page CSS goes HERE  -->
-{% block stylesheets %}
+        <!-- CSS -->
+        <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:400,100,300,500">
+        <link rel="stylesheet" href="{{ ASSETS_ROOT }}/login_statics/bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" href="{{ ASSETS_ROOT }}/login_statics/font-awesome/css/font-awesome.min.css">
+		<link rel="stylesheet" href="{{ ASSETS_ROOT }}/login_statics/css/form-elements.css">
+        <link rel="stylesheet" href="{{ ASSETS_ROOT }}/login_statics/css/style.css">
 
-  <!-- Google Font: Source Sans Pro -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="{{ ASSETS_ROOT }}/plugins/fontawesome-free/css/all.min.css">
-  <!-- icheck bootstrap -->
-  <link rel="stylesheet" href="{{ ASSETS_ROOT }}/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
-  <!-- Theme style -->
-  <link rel="stylesheet" href="{{ ASSETS_ROOT }}/css/adminlte.min.css">
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
 
-{% endblock stylesheets %}
+        <!-- Favicon and touch icons -->
+        <link rel="shortcut icon" href="assets/ico/favicon.png">
+        <link rel="apple-touch-icon-precomposed" sizes="144x144" href="assets/ico/apple-touch-icon-144-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" sizes="114x114" href="assets/ico/apple-touch-icon-114-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" sizes="72x72" href="assets/ico/apple-touch-icon-72-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" href="assets/ico/apple-touch-icon-57-precomposed.png">
 
-{% block content %}
+    </head>
 
-  <div class="login-box">
+    <body>
 
-    <div class="login-logo">
-        <a target="_blank" rel="noopener noreferrer" 
-           href="https://appseed.us/admin-dashboards/django-dashboard-adminlte">Django <b>Admin</b>LTE</a>
-    </div>
+        <!-- Top content -->
+        <div class="top-content">
+        	
+            <div class="inner-bg">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-8 col-sm-offset-2 text">
+                            <h1 style="color:red;"><strong>پرتال ورزشگاه هیرا</strong> </h1>
+                            <div class="description">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 col-sm-offset-3 form-box">
+                        	<div class="form-top">
+                        		<div class="form-top-left">
+                        			<h3>نام کاربری و گذر واژه را وارد کنید</h3>
+                        		</div>
+                        		<div class="form-top-right">
+                        			<i class="fa fa-lock"></i>
+                        		</div>
+                            </div>
+                            <div class="form-bottom">
 
-    <!-- /.login-logo -->
-    <div class="card">
-      <div class="card-body login-card-body">
+			                    <form role="form" action="" method="post" class="login-form">
+                                              {% csrf_token %}
 
-            <p class="login-box-msg">
-            {% if msg %}
-              <span class="text-danger"> {{ msg | safe }} </span>
-            {% else %}
-                Add your credentials
-            {% endif %}
-        </p>
-
-        <form method="post" action="">
-
-          {% csrf_token %}
-
-          <div class="input-group mb-3">
-            {{ form.username }}
-            <div class="input-group-append">
-              <div class="input-group-text">
-                <span class="fas fa-envelope"></span>
-              </div>
+			                    	<div class="form-group">
+			                    		<label class="sr-only" for="form-username">Username</label>
+			                        	{{ form.username }}
+			                        </div>
+			                        <div class="form-group">
+			                        	<label class="sr-only" for="form-password">Password</label>
+			                        	{{ form.password }}
+			                        </div>
+			                        <button type="submit" class="btn">Sign in!</button>
+			                    </form>
+		                    </div>
+                        </div>
+                    </div>
+                
+                </div>
             </div>
-          </div>
-          <div class="input-group mb-3">
-            {{ form.password }}
-            <div class="input-group-append">
-              <div class="input-group-text">
-                <span class="fas fa-lock"></span>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-8">
-              <div class="icheck-primary">
-                <input type="checkbox" id="remember">
-                <label for="remember">
-                  Remember Me
-                </label>
-              </div>
-            </div>
-            <!-- /.col -->
-            <div class="col-4">
-              <button type="submit" name="login" class="btn btn-primary btn-block">Sign In</button>
-            </div>
-            <!-- /.col -->
-          </div>
-        </form>
-
-        <br /><br />
-
-        <div class="text-center">
-            Not a member? <a href="{% url 'register' %}" class="text-center">Register</a>
-            <br />
-            <br />
-            &copy; ColorLib 
-            <a target="_blank" rel="noopener noreferrer"
-               href="https://appseed.us/admin-dashboards/django-dashboard-adminlte"><b>Admin</b>LTE</a> 
-            - coded by <a target="_blank" rel="noopener noreferrer" href="https://appseed.us">AppSeed</a>.
+            
         </div>
 
-      </div>
-      <!-- /.login-card-body -->
-    </div>
 
-  </div>
+        <!-- Javascript -->
+        <script src="{{ ASSETS_ROOT }}/login_statics/js/jquery-1.11.1.min.js"></script>
+        <script src="{{ ASSETS_ROOT }}/login_statics/bootstrap/js/bootstrap.min.js"></script>
+        <script src="{{ ASSETS_ROOT }}/login_statics/js/jquery.backstretch.min.js"></script>
+        <script>
 
-{% endblock content %}
 
-<!-- Specific Page JS goes HERE  -->
-{% block javascripts %}
+jQuery(document).ready(function() {
+	
+    /*
+        Fullscreen background
+    */
+	$.backstretch([
+                   "{{ ASSETS_ROOT }}/login_statics/img/backgrounds/1.jpg"
+                 , "{{ ASSETS_ROOT }}/login_statics/img/backgrounds/2.jpg"
+                ], {duration: 3000, fade: 750});
+    
+    /*
+        Form validation
+    */
+    $('.login-form input[type="text"], .login-form input[type="password"], .login-form textarea').on('focus', function() {
+    	$(this).removeClass('input-error');
+    });
+    
+    $('.login-form').on('submit', function(e) {
+    	
+    	$(this).find('input[type="text"], input[type="password"], textarea').each(function(){
+    		if( $(this).val() == "" ) {
+    			e.preventDefault();
+    			$(this).addClass('input-error');
+    		}
+    		else {
+    			$(this).removeClass('input-error');
+    		}
+    	});
+    	
+    });
+    
+    
+});
 
-  <!-- jQuery -->
-  <script src="{{ ASSETS_ROOT }}/plugins/jquery/jquery.min.js"></script>
-  <!-- Bootstrap 4 -->
-  <script src="{{ ASSETS_ROOT }}/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
 
-{% endblock javascripts %}
+
+        </script>
+    </body>
+
+</html>
