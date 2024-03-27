@@ -38,7 +38,7 @@ class PersonAutocomplete(autocomplete.Select2QuerySetView):
 @login_required(login_url="/login/")
 def index(request):
     context = {'segment': 'index'}
-    context['username']=request.user.username
+    context['username']=request.user
     if request.user.is_superuser:
         context['jdate'] = date_maker()
         person = Person.objects.filter(role="student")
@@ -169,16 +169,16 @@ def personalreport(request, person_id):
         
         person = Person.objects.get(id=person_id)
 
-        analysisperson = Analysis.objects.filter(analysis_person=person_id).latest('dot')
+        context = {'segment': 'personalreport'}
+        '''analysisperson = Analysis.objects.filter(analysis_person=person_id).latest('dot')
         lastanalysis = str(analysisperson.dot).split("-")
         monti=int(lastanalysis[1])+1
         if monti>12:
             yeari=int(lastanalysis[0])+1
             monti=monti%12
         else:
-            yeari = int(lastanalysis[0])
-        context = {'segment': 'personalreport'}
-        context['nextanalysis'] = f"{yeari}-{monti}-{lastanalysis[2]}"
+            yeari = int(lastanalysis[0])'''
+        #context['nextanalysis'] = person.nextanalysis
 
         context['person'] = person
         context['imglen'] = len(person.simage.name)
@@ -198,9 +198,9 @@ def personalreport(request, person_id):
         analysis=Analysis.objects.filter(analysis_person=person_id)       
         context["analysis"] = analysis
         
-        trainername=Person.objects.get(classname=person.classname , role='trainer' )
+        trainername=Person.objects.filter(classname=person.classname , role='trainer' ).latest('pk')
         context["trainername"] = trainername
-        print("!!!!!!!!!!!!!!!!",trainername.id)
+
         weight=[]
         bfm=[]
         smm=[]

@@ -170,7 +170,8 @@ class Person(AbstractBaseUser):
     t_shortdesc = models.CharField(
         max_length=50, verbose_name="توضیح کوتاه ", blank=True)
     
-
+    nextanalysis = models.CharField(
+        max_length=20, blank=True,editable=False)
 
     USERNAME_FIELD = "username"
 
@@ -199,12 +200,16 @@ class Person(AbstractBaseUser):
         # Simplest possible answer: All admins are staff
         return self.is_superuser
 
+    def __init__(self, *args, **kwargs):
+        super(Person, self).__init__(*args, **kwargs)
+        # Store the original value of the field
+        self.__original_password = self.password
+
     def save(self, *args, **kwargs):
         #self.full_name = f"{self.first_name} {self.last_name}"
-        if not self.is_superuser:
+        if (not self.is_superuser and self.pk is None ) or  self.password != self.__original_password:
             self.set_password(self.password)
         self.is_superuser = True if self.role == 'employee' else False
-
         super().save(*args, **kwargs)
 
     @property

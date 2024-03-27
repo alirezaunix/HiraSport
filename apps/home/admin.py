@@ -78,7 +78,7 @@ class ClassiAdmin(admin.ModelAdmin):
 
 @admin.register(Analysis)
 class AnalysisAdmin(admin.ModelAdmin):
-    list_display = ['id', 'analysis_person']
+    list_display = ['id', 'analysis_person','dot']
     #form = AnalysisForm
     #model = Analysis
     list_filter = ['analysis_person']
@@ -142,7 +142,15 @@ def AnalysysAction( instance, created, **kwargs):
                 diffrence_smm=instance.current_state_smm,
                 diffrence_pbf=instance.current_state_pbf,
             )
-  #  if instance.reportfile.name=="":
-   #     Analysis.objects.filter(id=instance.pk).update(reportfile=str())
-    #    print("@@@@@@@@@@@@@@@", instance.reportfile.name)
-    #Analysis.objects.filter(id=instance.pk).update(reportfile_len = 1 if instance.reportfile !="" else 0)
+    analysisperson = Analysis.objects.filter(analysis_person=instance.analysis_person).latest('dot')
+    print("XxXxXxXxXxXx", analysisperson.dot)
+    lastanalysis = str(analysisperson.dot).split("-")
+    monti=int(lastanalysis[1])+1
+    if monti>12:
+        yeari=int(lastanalysis[0])+1
+        monti=monti%12
+    else:
+        yeari = int(lastanalysis[0])
+    person_obj = Person.objects.filter(full_name__contains=str(instance.analysis_person).split(
+        " ")[0])
+    person_obj.update(nextanalysis=f"{yeari}-{monti}-{lastanalysis[2]}")
