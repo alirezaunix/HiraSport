@@ -37,25 +37,22 @@ class PersonAutocomplete(autocomplete.Select2QuerySetView):
 
 @login_required(login_url="/login/")
 def index(request):
-   if request.user.is_superuser:
-        '''
-        print(dir(User))
-        
-        print("---------------")
-        print(request.user.hash_password())
-        print("---------------")
-        print(dir(Person))'''
-        context = {'segment': 'index'}
+    context = {'segment': 'index'}
+    context['username']=request.user.username
+    if request.user.is_superuser:
         context['jdate'] = date_maker()
         person = Person.objects.filter(role="student")
         context['person'] = person
         html_template = loader.get_template('home/index.html')
         return HttpResponse(html_template.render(context, request))
-   else:
+    elif request.user.role=="student":
        person = Person.objects.get(username=request.user.username)
        # personalreport(request, person.id)
        #print(">>>>", person.id)
        return HttpResponseRedirect(f'personalreport/{person.id}')
+    elif request.user.role=="trainer":
+       person = Person.objects.get(username=request.user.username)
+       return HttpResponseRedirect(f'trainerreport/{person.id}')
 
 
 @login_required(login_url="/login/")
@@ -234,14 +231,14 @@ def trainerreport(request, trainer_id):
         trainerseesion = SessionDate.objects.filter(session_person=trainer_id)
         mont=(str(jdatetime.datetime.now()).split("-")[1])     
         for item in trainerseesion:
-            if f"-{mont}-" in str(item.dos_trainer):
+            if f"-{mont}-" in str(item.dos):
                 count+=1
         context = {'segment': 'trainerreport'}
         context['trainer'] = trainer
         context['trainerseesion'] = trainerseesion
         context['mont']=mont
         context['count']=count
-        context['superuserview'] = True if request.user.is_superuser else False
+        context['superuserview'] = True if request.user.is_superuser or request.user.role=="trainer" else False
         html_template = loader.get_template('home/trainerreport.html')
         return HttpResponse(html_template.render(context, request))
 '''
@@ -268,7 +265,7 @@ def trainerslist(request):
         "bg-fuchsia",
         ]
         
-        trainers = Trainer.objects.all()
+        trainers = Person.objects.filter(role="trainer")
         context = {'segment': 'trainerslist'}
         context['trainers'] = trainers
         context['colorbg'] = colorbg

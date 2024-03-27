@@ -49,7 +49,7 @@ nk Page {% endblock %}
             <!-- Add the bg color to the header using any of the bg-* classes -->
             <div class="widget-user-header {{ colorbg|random }}">
               
-              <a href='/personalreport/{{trainer.id}}'><h3 class="widget-user-username">{{trainer.tfull_name}}</h3></a>
+              <a href='/personalreport/{{trainer.id}}'><h3 class="widget-user-username">{{trainer.full_name}}</h3></a>
             </div>
 
             <div class="widget-user-image">
@@ -64,9 +64,9 @@ nk Page {% endblock %}
               <div class="row">
                   <div class="description-block">
                     <h5 class="description-header">میزان تحصیلات:</h5>
-                    <span class="description-text">{{ trainer.edu }}</span><br>
+                    <span class="description-text">{{ trainer.t_edu }}</span><br>
                     <h5 class="description-header">سوابق تجربی:</h5>
-                    <span class="description-text">{{ trainer.exp }}</span>
+                    <span class="description-text">{{ trainer.t_exp }}</span>
                   </div>
               </div>
               <!-- /.row -->

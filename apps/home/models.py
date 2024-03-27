@@ -155,10 +155,10 @@ class Person(AbstractBaseUser):
     username = models.CharField(
         max_length=20, verbose_name="نام کاربری", unique=True)
     password = models.CharField(
-        max_length=20, verbose_name="گذر واژه", blank=True)
+        max_length=128, verbose_name="گذر واژه", blank=True)
     email = models.EmailField(verbose_name="ایمیل", blank=True)
     is_active = models.BooleanField(default=True, verbose_name="فعال")
-    is_admin = models.BooleanField(default=False, editable=False)
+    #is_admin = models.BooleanField(default=False, editable=False)
     is_superuser = models.BooleanField(default=False, editable=False)
     is_staff = models.BooleanField(default=False, editable=False)
     is_trainer = models.BooleanField(default=False, editable=False)
@@ -203,6 +203,8 @@ class Person(AbstractBaseUser):
         #self.full_name = f"{self.first_name} {self.last_name}"
         if not self.is_superuser:
             self.set_password(self.password)
+        self.is_superuser = True if self.role == 'employee' else False
+
         super().save(*args, **kwargs)
 
     @property

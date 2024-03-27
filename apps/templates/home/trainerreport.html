@@ -86,7 +86,7 @@
               <hr>
               <strong><i class="fa fa-pencil margin-r-5"></i>رشته ورزشی</strong>
               <p>
-                  {{ trainer.tsport }}
+                  {{ trainer.sfield }}
               </p>
 
 
@@ -120,7 +120,7 @@
               <hr>
               <strong><i class="fa fa-certificate margin-r-5"></i>سوابق  </strong>
               <p>
-                  {{ trainer.exp }}
+                  {{ trainer.t_exp }}
               </p>
 
               
@@ -141,7 +141,7 @@
                                 {% for s in trainerseesion%}
                                 <tr>
                                     <td>{{s.id}}</td>
-                                    <td>{{s.dos_trainer}}</td>
+                                    <td>{{s.dos}}</td>
                                 </tr>
                                 {%endfor%}
                   </table>

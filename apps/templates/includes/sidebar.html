@@ -1,3 +1,5 @@
+    {% csrf_token %}
+
   <!-- Main Sidebar Container -->
  <aside class="main-sidebar">
     <!-- sidebar: style can be found in sidebar.less -->
@@ -5,11 +7,10 @@
       <!-- Sidebar user panel -->
       <div class="user-panel">
         <div class="pull-right image">
-          <img src="dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
+          <p><i class="fa fa-circle text-success"></i></p>
         </div>
         <div class="pull-right info">
-          <p>علیرضا کیانی</p>
-          <a href="#"><i class="fa fa-circle text-success"></i> آنلاین</a>
+          <p>{{ username }} </p>
         </div>
       </div>
       <!-- search form -->
