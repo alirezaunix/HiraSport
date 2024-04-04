@@ -1,0 +1,17 @@
+{
+    "disks":[
+        {
+            "name": "dbdisk",
+            "mountTo":"dbdisk"
+        },
+        {
+            "name": "media",
+            "mountTo":"media"
+        }
+    ],
+    
+  "django": {
+    "settingsFile": "core/settings.py"
+  }
+
+}

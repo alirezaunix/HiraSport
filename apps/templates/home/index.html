@@ -1,4 +1,5 @@
 {% extends "layouts/base.html" %}
+{% load static %}
 
 {% block title %} Dashboard {% endblock %} 
 
@@ -14,7 +15,9 @@
   <!-- persian Date Picker -->
   <link rel="stylesheet" href="{{ ASSETS_ROOT }}/dist/css/persian-datepicker-0.4.5.min.css">
   <!-- Font Awesome -->
-  <link rel="stylesheet" href="{{ ASSETS_ROOT }}/bower_components/font-awesome/css/font-awesome.min.css">
+
+  <link rel="stylesheet" href="{% static 'assets/bower_components/font-awesome/css' %}/font-awesome.min.css">
+
   <!-- Ionicons -->
   <link rel="stylesheet" href="{{ ASSETS_ROOT }}/bower_components/Ionicons/css/ionicons.min.css">
   <!-- Theme style -->

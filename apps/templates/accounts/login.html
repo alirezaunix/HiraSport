@@ -1,4 +1,6 @@
 <!DOCTYPE html>
+    {% load static %}
+
 <html lang="en">
 
     <head>
@@ -93,10 +95,9 @@ jQuery(document).ready(function() {
         Fullscreen background
     */
 	$.backstretch([
-                   "{{ ASSETS_ROOT }}/login_statics/img/backgrounds/1.jpg"
-                 , "{{ ASSETS_ROOT }}/login_statics/img/backgrounds/2.jpg"
+                   "{% static 'assets/login_statics/img/backgrounds' %}/1.JPG"
+                   ,"{% static 'assets/login_statics/img/backgrounds' %}/2.JPG"
                 ], {duration: 3000, fade: 750});
-    
     /*
         Form validation
     */

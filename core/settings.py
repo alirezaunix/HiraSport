@@ -5,7 +5,7 @@ import environ
 
 env = environ.Env(
     # set casting, default value
-    DEBUG=(bool, False)
+    DEBUG=(bool, True)
 )
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -126,8 +126,8 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': 'db.sqlite3',
-            # 'NAME': os.path.join(BASE_DIR, 'db_disk', 'db.sqlite3'),
+            #'NAME': 'db.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'dbdisk', 'db.sqlite3'),
         }
     }
 

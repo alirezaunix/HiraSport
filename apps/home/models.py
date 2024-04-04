@@ -164,11 +164,11 @@ class Person(AbstractBaseUser):
     is_trainer = models.BooleanField(default=False, editable=False)
 
     t_edu = models.CharField(
-        max_length=50, verbose_name="میزان تحصیلات", blank=True)
+        max_length=250, verbose_name="میزان تحصیلات", blank=True)
     t_exp = models.CharField(
-        max_length=50, verbose_name="سوابق تجربی", blank=True)
+        max_length=250, verbose_name="سوابق تجربی", blank=True)
     t_shortdesc = models.CharField(
-        max_length=50, verbose_name="توضیح کوتاه ", blank=True)
+        max_length=250, verbose_name="توضیح کوتاه ", blank=True)
     
     nextanalysis = models.CharField(
         max_length=20, blank=True,editable=False)
