@@ -32,58 +32,6 @@ class SportField(models.Model):
     def __str__(self):
         return self.sport_field
 
-'''
-class Trainer(models.Model):
-   
-    gender_choice = ('m', 'مرد'), ('f', 'زن')
-    id = models.AutoField(primary_key=True, verbose_name='ردیف')
-    tsport = models.ForeignKey(
-        SportField, on_delete=models.CASCADE, verbose_name='رشته ', blank=True, null=True)
-    tfull_name = models.CharField(
-        max_length=30, verbose_name="نام و نام خانوادگی")
-    tphone = models.CharField(max_length=20, verbose_name="شماره تلفن ")
-    edu = models.CharField(
-        max_length=50, verbose_name="میزان تحصیلات", blank=True)
-    exp = models.CharField(
-        max_length=50, verbose_name="سوابق تجربی", blank=True)
-    shortdesc = models.CharField(
-        max_length=50, verbose_name="توضیح کوتاه ", blank=True)
-    timage = models.ImageField(verbose_name="عکس ", blank=True, null=True)
-    gender = models.CharField(
-        max_length=1, verbose_name="جنسیت", choices=gender_choice, blank=True)
-    dob = jmodels.jDateField(verbose_name="تاریخ تولد", null=True)
-    username = models.CharField(
-        max_length=20, verbose_name="نام کاربری",default="") #TODO: make unique later
-    password = models.CharField(
-        max_length=20, verbose_name="گذر واژه", blank=True)
-    email = models.EmailField(verbose_name="ایمیل", blank=True)
-
-    objects = MyUserManager()
-
-
-    class Meta:
-        verbose_name = "مربی"
-        verbose_name_plural = "مربی ها"
-
-    def __str__(self):
-        return self.tfull_name
-'''
-'''
-class TrainerSeesion(models.Model):
-    id = models.AutoField(primary_key=True, verbose_name='ردیف')
-    session_trainer = models.ForeignKey(
-        Trainer, on_delete=models.CASCADE, verbose_name="نام مربی")
-    dos_trainer = jmodels.jDateField(verbose_name="تاریخ جلسات")
-    class_trainer = models.CharField(max_length=20, verbose_name="نام کلاس")
-
-    class Meta:
-        verbose_name = "جلسه مربی"
-        verbose_name_plural = "جلسات مربی"
-
-    def __str__(self):
-        return f"{self.session_trainer} {self.dos_trainer}"
-'''
-
 class Classi(models.Model):
     weekdays_list = ('Sat', 'شنبه'), ('Sun', 'یکشنبه'), ('Mon', 'دوشنبه'), (
         'Tue', 'سه شنبه'), ('Wed', 'چهارشنبه'), ('Thu', 'پنجشنبه'), ('Fri', 'جمعه')
@@ -94,7 +42,8 @@ class Classi(models.Model):
     weekdays = MultiSelectField(
         choices=weekdays_list, max_choices=7, max_length=30)
     starttime = models.TimeField()
-
+    ctrainer = models.ForeignKey(
+        "Person", on_delete=models.CASCADE, null=True, blank=True, default=None, verbose_name="مربی کلاس")
     class Meta:
         verbose_name = "کلاس"
         verbose_name_plural = "کلاس ها"

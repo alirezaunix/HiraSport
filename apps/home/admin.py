@@ -71,7 +71,7 @@ class SessionDateAdmin(admin.ModelAdmin):
 
 @admin.register(Classi)
 class ClassiAdmin(admin.ModelAdmin):
-    list_display = ['id', 'weekdays', 'cname', 'starttime',]
+    list_display = ['id', 'weekdays', 'cname', 'starttime','ctrainer']
     form = ClassiForm
     search_fields = ['session_person']
 

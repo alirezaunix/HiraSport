@@ -38,7 +38,7 @@ class ExampleForm(forms.Form):
 class ClassiForm(forms.ModelForm):
     class Meta:
         model = Classi
-        fields = ['cname', 'weekdays', 'starttime']
+        fields = ['cname', 'weekdays', 'starttime','ctrainer']
 
         widgets = {
             'starttime' : TimePickerInput(),

@@ -197,10 +197,14 @@ def personalreport(request, person_id):
         
         analysis=Analysis.objects.filter(analysis_person=person_id)       
         context["analysis"] = analysis
-        
+        '''
         trainername=Person.objects.filter(classname=person.classname , role='trainer' ).latest('pk')
         context["trainername"] = trainername
-
+'''
+        classiname=Classi.objects.get(cname=person.classname)
+        context['trainer_id'] = Person.objects.get(
+            full_name=classiname.ctrainer).id
+        
         weight=[]
         bfm=[]
         smm=[]
