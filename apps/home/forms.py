@@ -1,7 +1,7 @@
 
 from dal import autocomplete
 from django import forms
-from .models import Peyment, SessionDate, Classi, Analysis,Person
+from .models import Peyment, SessionDate, Classi, Analysis, Person, Insurance
 
 class PeymentForm(forms.ModelForm):
     class Meta:
@@ -12,6 +12,20 @@ class PeymentForm(forms.ModelForm):
         widgets = {
             'peyment_person': autocomplete.ModelSelect2(url='select2_fk'), 
         }
+
+
+class InsuranceForm(forms.ModelForm):
+    class Meta:
+        model = Insurance
+        fields = ('dop', 'insurance_person', 'rimage',
+                   'mcharged', 'nextiInsurancedate')
+        search_fields = ['dop', 'insurance_person']
+
+        widgets = {
+            'insurance_person': autocomplete.ModelSelect2(url='select2_fk'),
+        }
+
+
         
 class SessionForm(forms.ModelForm):
     class Meta:

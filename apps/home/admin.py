@@ -2,9 +2,9 @@
 
 from django.contrib.auth.models import User
 from django.contrib import admin
-from .models import Person, SportField, Peyment, SessionDate, Classi, AbsenceDate,Analysis
+from .models import Person, SportField, Peyment, SessionDate, Classi, AbsenceDate, Analysis, Insurance
 from django.db.models.signals import post_save
-from .forms import PeymentForm, SessionForm, ClassiForm #AnalysisForm
+from .forms import PeymentForm, SessionForm, ClassiForm, InsuranceForm  # AnalysisForm
 from django.dispatch import receiver
 from django.contrib.auth.models import User
 import jdatetime
@@ -62,6 +62,15 @@ class PeymentAdmin(admin.ModelAdmin):
     search_fields = ['peyment_person']
 
 
+@admin.register(Insurance)
+class InsuranceAdmin(admin.ModelAdmin):
+    list_display = ["id", "insurance_person",
+                    "dop", "rimage", "mcharged", "nextiInsurancedate"]
+    form = InsuranceForm
+    list_filter = ['dop']
+    search_fields = ['insurance_person']
+
+
 @admin.register(SessionDate)
 class SessionDateAdmin(admin.ModelAdmin):
     list_display = ['id', 'session_person', 'dos']
@@ -107,6 +116,15 @@ def PeymentAction(instance, **kwargs):
         " ")[0])
     current_value = list(person_obj.values())[0]['rsession']
     person_obj.update(rsession=current_value+instance.ncharged)
+
+
+@receiver(post_save, sender=Insurance)
+def InsuranceAction(instance, **kwargs):
+    person_obj = Person.objects.filter(full_name__contains=str(instance.insurance_person).split(
+        " ")[0])
+    person_obj.update(insurancedate=instance.nextiInsurancedate)
+
+
 
 
 @receiver(post_save, sender=SessionDate)

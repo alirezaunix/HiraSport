@@ -80,7 +80,7 @@ class Person(AbstractBaseUser):
     scode = models.CharField(
         max_length=10, verbose_name="کدبیمه ورزشی", blank=True)
     insurancedate = jmodels.jDateField(
-        verbose_name="تاریخ ثبت بیمه ورزشی", null=True,blank=True)
+        verbose_name="تاریخ بعدی بیمه ورزشی", null=True,blank=True)
     shistory = models.TextField(verbose_name="سابقه ورزشی", blank=True)
     hhistory = models.TextField(verbose_name="سابقه پزشکی", blank=True)
     dob = jmodels.jDateField(verbose_name="تاریخ تولد", null=True,blank=True)
@@ -112,12 +112,9 @@ class Person(AbstractBaseUser):
     is_staff = models.BooleanField(default=False, editable=False)
     is_trainer = models.BooleanField(default=False, editable=False)
 
-    t_edu = models.CharField(
-        max_length=250, verbose_name="میزان تحصیلات", blank=True)
-    t_exp = models.CharField(
-        max_length=250, verbose_name="سوابق تجربی", blank=True)
-    t_shortdesc = models.CharField(
-        max_length=250, verbose_name="توضیح کوتاه ", blank=True)
+    t_edu = models.TextField(verbose_name="میزان تحصیلات", blank=True)
+    t_exp = models.TextField(verbose_name="سوابق تجربی", blank=True)
+    t_shortdesc = models.TextField(verbose_name="توضیح کوتاه ", blank=True)
     
     nextanalysis = models.CharField(
         max_length=20, blank=True,editable=False)
@@ -168,23 +165,24 @@ class Person(AbstractBaseUser):
         return self.is_superuser
 
 
-class Peyment(models.Model):
+class Insurance(models.Model):
     id = models.AutoField(primary_key=True, verbose_name='ردیف')
-    peyment_person = models.ForeignKey(
+    insurance_person = models.ForeignKey(
         Person, on_delete=models.CASCADE, verbose_name='شخص', blank=True, null=True)
     dop = jmodels.jDateField(verbose_name="تاریخ پرداخت")
     rimage = models.ImageField(
         verbose_name="عکس فیش پرداختی", null=True, blank=True)
     mcharged = models.IntegerField(
         verbose_name="مقدار پول واریز شده", blank=True, default=0)
-    ncharged = models.IntegerField(verbose_name="تعداد جلسات شارژ شده")
+    nextiInsurancedate  = jmodels.jDateField(verbose_name="تاریخ تمدید تاریخ بعدی")
+
 
     class Meta:
-        verbose_name = "پرداختی"
-        verbose_name_plural = "پرداختی ها"
+        verbose_name = "بیمه"
+        verbose_name_plural = "بیمه ها"
 
     def __str__(self):
-        return f"{self.peyment_person}"
+        return f"{self.insurance_person}"
 
 
 class SessionDate(models.Model):
@@ -262,3 +260,22 @@ class Analysis (models.Model):
 
     def __str__(self):
         return f"{self.analysis_person} {self.dot}"
+
+
+class Peyment(models.Model):
+    id = models.AutoField(primary_key=True, verbose_name='ردیف')
+    peyment_person = models.ForeignKey(
+        Person, on_delete=models.CASCADE, verbose_name='شخص', blank=True, null=True)
+    dop = jmodels.jDateField(verbose_name="تاریخ پرداخت")
+    rimage = models.ImageField(
+        verbose_name="عکس فیش پرداختی", null=True, blank=True)
+    mcharged = models.IntegerField(
+        verbose_name="مقدار پول واریز شده", blank=True, default=0)
+    ncharged = models.IntegerField(verbose_name="تعداد جلسات شارژ شده")
+
+    class Meta:
+        verbose_name = "پرداختی"
+        verbose_name_plural = "پرداختی ها"
+
+    def __str__(self):
+        return f"{self.peyment_person}"
