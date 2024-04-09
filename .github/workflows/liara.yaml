@@ -31,7 +31,7 @@ jobs:
         liara deploy --app="hesam1" --api-token="$LIARA_TOKEN" --no-app-logs
 
     - name: Run your script
-        run: | 
-          python3 manage.py makemigrations 
-          python3 manage.py migrate
+      run: | 
+        python3 manage.py makemigrations 
+        python3 manage.py migrate
 
