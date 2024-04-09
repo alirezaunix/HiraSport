@@ -182,8 +182,8 @@ def personalreport(request, person_id):
 
         context['person'] = person
         context['imglen'] = len(person.simage.name)
-        l1 = str(person.insurancedate).split("-")
-        context['nextinsurance']=f"{int(l1[0])+1}-{l1[1]}-{l1[2]}"
+        #l1 = str(person.insurancedate).split("-")
+        #context['nextinsurance']=f"{int(l1[0])+1}-{l1[1]}-{l1[2]}"
         context['buttonShow'] = True if request.user.is_superuser else False
         
         session = SessionDate.objects.filter(session_person=person_id)

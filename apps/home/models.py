@@ -174,7 +174,7 @@ class Insurance(models.Model):
         verbose_name="عکس فیش پرداختی", null=True, blank=True)
     mcharged = models.IntegerField(
         verbose_name="مقدار پول واریز شده", blank=True, default=0)
-    nextiInsurancedate  = jmodels.jDateField(verbose_name="تاریخ تمدید تاریخ بعدی")
+    nextiInsurancedate  = jmodels.jDateField(verbose_name="تاریخ تمدید  بعدی")
 
 
     class Meta:
