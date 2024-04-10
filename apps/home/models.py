@@ -171,7 +171,7 @@ class Insurance(models.Model):
         Person, on_delete=models.CASCADE, verbose_name='شخص', blank=True, null=True)
     dop = jmodels.jDateField(verbose_name="تاریخ پرداخت")
     rimage = models.ImageField(
-        verbose_name="عکس فیش پرداختی", null=True, blank=True)
+        verbose_name="عکس  بیمه", null=True, blank=True)
     mcharged = models.IntegerField(
         verbose_name="مقدار پول واریز شده", blank=True, default=0)
     nextiInsurancedate  = jmodels.jDateField(verbose_name="تاریخ تمدید  بعدی")
