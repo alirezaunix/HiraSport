@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Define the fields to show/hide based on the role
         var fieldsForEmployee = document.querySelectorAll('.field-employee_field');
         var fieldsForTrainer = document.querySelectorAll('.field-t_edu, .field-t_exp, .field-t_shortdesc,.field-sfield ,.field-classname,.field-phone1');
-        var fieldsForStudent = document.querySelectorAll('.field-ncode,.field-scode,.field-insurancedate, .field-shistory, .field-hhistory,.field-sfield,.field-classname ,.field-phone1,.field-phone2,.field-address,.field-rsession');
+        var fieldsForStudent = document.querySelectorAll('.field-ncode,.field-scode,.field-insurancedate, .field-shistory, .field-hhistory,.field-sfield,.field-classname ,.field-phone1,.field-phone2,.field-address,.field-rsession,.field-discount');
 
         // Get the value of the selected role
         var selectedRole = document.querySelector('input[name="role"]:checked').value;

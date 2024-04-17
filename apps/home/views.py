@@ -31,7 +31,7 @@ class PersonAutocomplete(autocomplete.Select2QuerySetView):
         #    return Person.objects.none()
         qs = Person.objects.all()
         if self.q:
-            qs = qs.filter(first_name__istartswith=self.q)
+            qs = qs.filter(full_name__istartswith=self.q)
         return qs
 
 
@@ -83,8 +83,8 @@ def todayclasslist(request):
         for item in classesname:
             if not objP.is_superuser :
                 print("******",objP.id)
-                if item in objP.classname.cname:
-                    counter += 1
+               # if item in objP.classname.cname:
+                #    counter += 1
         personcount.append(counter)
 
     row_data = []
@@ -123,30 +123,38 @@ def analyzereport(request):
 @login_required(login_url="/login/")
 def classlist(request, ccname):
     if request.method == 'POST':
+        studentList=[]
         cname_obj = Classi.objects.get(cname=ccname)
         print(request.POST)
         for item in request.POST:
             if 'status' in item:
                 print("$$$$$$$$$$$",item)
                 person_id = request.POST[item].split("_")[-1]
+                person = Person.objects.get(full_name=person_id)
                 if request.POST[item].split("_")[0] == 'present':
-                    person = Person.objects.get(full_name=person_id)
                     SessionDate.objects.create(
                         session_person=person, dos=jdatetime.datetime.now() ,classname=cname_obj)
                 elif request.POST[item].split("_")[0] == 'absent':
-                    person = Person.objects.get(full_name=person_id)
+                    #person = Person.objects.get(full_name=person_id)
                     AbsenceDate.objects.create(
                         absent_person=person, doa=jdatetime.datetime.now(),classname=cname_obj)
+                studentList.append(person)
             elif "trainer" in item:   
                 fname = request.POST[item].split("_")[-1]
                 trainer=Person.objects.get(full_name=fname)
-                SessionDate.objects.create(
+                sessionObj=SessionDate.objects.create(
                     session_person=trainer, dos=jdatetime.datetime.now(), classname=cname_obj)
+        print(studentList)
+        for item in studentList:
+            sessionObj.sstudent.add(item)
+        sessionObj.save()
+            
     context = {'segment': 'classlist'}
     person = []
     for obj in Person.objects.filter(role='student'):
         if not obj.is_admin:
-            if obj.classname.cname == ccname  :
+            print("************", obj.classname)
+            if obj.classname != None and obj.classname.cname == ccname:
                 person.append(obj)
     context['person'] = person
     context['cname'] = ccname
@@ -170,15 +178,6 @@ def personalreport(request, person_id):
         person = Person.objects.get(id=person_id)
 
         context = {'segment': 'personalreport'}
-        '''analysisperson = Analysis.objects.filter(analysis_person=person_id).latest('dot')
-        lastanalysis = str(analysisperson.dot).split("-")
-        monti=int(lastanalysis[1])+1
-        if monti>12:
-            yeari=int(lastanalysis[0])+1
-            monti=monti%12
-        else:
-            yeari = int(lastanalysis[0])'''
-        #context['nextanalysis'] = person.nextanalysis
 
         context['person'] = person
         context['imglen'] = len(person.simage.name)
@@ -197,10 +196,7 @@ def personalreport(request, person_id):
         
         analysis=Analysis.objects.filter(analysis_person=person_id)       
         context["analysis"] = analysis
-        '''
-        trainername=Person.objects.filter(classname=person.classname , role='trainer' ).latest('pk')
-        context["trainername"] = trainername
-'''
+       
         classiname=Classi.objects.get(cname=person.classname)
         context['trainer_id'] = Person.objects.get(
             full_name=classiname.ctrainer).id
@@ -234,14 +230,23 @@ def trainerreport(request, trainer_id):
         trainer = Person.objects.get(id=trainer_id)
         trainerseesion = SessionDate.objects.filter(session_person=trainer_id)
         mont=(str(jdatetime.datetime.now()).split("-")[1])     
+        sumi=0
+        
         for item in trainerseesion:
+            discounts = 0
             if f"-{mont}-" in str(item.dos):
                 count+=1
+            for i in item.sstudent.all():
+                discounts+=i.discount
+            sumi+=(item.classname.fee/12*len(item.sstudent.all()) -
+                  discounts*(item.classname.fee/12)/100)
+        print(sumi/2)
         context = {'segment': 'trainerreport'}
         context['trainer'] = trainer
         context['trainerseesion'] = trainerseesion
         context['mont']=mont
         context['count']=count
+        context['sumOfMounth']=sumi/2
         context['superuserview'] = True if request.user.is_superuser or request.user.role=="trainer" else False
         html_template = loader.get_template('home/trainerreport.html')
         return HttpResponse(html_template.render(context, request))

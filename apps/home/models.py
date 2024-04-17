@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from django_jalali.db import models as jmodels
 from multiselectfield import MultiSelectField
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 
 class MyUserManager(BaseUserManager):
@@ -38,12 +39,14 @@ class Classi(models.Model):
     id = models.AutoField(primary_key=True, verbose_name='ردیف')
 #    tname = models.ForeignKey(Trainer, on_delete=models.CASCADE,
 #                              max_length=50, verbose_name='مربی ', blank=True, null=True)
-    cname = models.CharField(max_length=20, verbose_name="نام کلاس ")
+    cname = models.CharField(
+        max_length=20, verbose_name="نام کلاس ")
     weekdays = MultiSelectField(
         choices=weekdays_list, max_choices=7, max_length=30)
     starttime = models.TimeField()
     ctrainer = models.ForeignKey(
         "Person", on_delete=models.CASCADE, null=True, blank=True, default=None, verbose_name="مربی کلاس")
+    fee=models.IntegerField(default=0,verbose_name=" شهریه ۱۲ جلسه (تومان)",blank=True)
     class Meta:
         verbose_name = "کلاس"
         verbose_name_plural = "کلاس ها"
@@ -91,6 +94,7 @@ class Person(AbstractBaseUser):
                                null=True, blank=True, default=None, verbose_name="رشته ورزشی")
     classname = models.ForeignKey(
         Classi, on_delete=models.CASCADE, null=True, blank=True, default=None, verbose_name="کلاس")
+    discount = models.IntegerField(default=0,blank=True,validators=[MinValueValidator(0),MaxValueValidator(100)],verbose_name="درصد تخفیف نفر بر روی دوره ها")
     phone1 = models.CharField(
         max_length=20, verbose_name="شماره تلفن اول", blank=True,null=True)
     phone2 = models.CharField(
@@ -192,6 +196,8 @@ class SessionDate(models.Model):
     classname = models.ForeignKey(
         Classi, on_delete=models.CASCADE, null=True, blank=True, default=None, verbose_name="کلاس")
     dos = jmodels.jDateField(verbose_name="تاریخ جلسه")
+    sstudent = models.ManyToManyField(
+        Person, related_name='studentINthisSession')
 
     class Meta:
         verbose_name = "جلسه"

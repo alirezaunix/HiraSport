@@ -11,23 +11,6 @@ import jdatetime
 from django import forms
 
 
-
-'''
-    
-@admin.register(Trainer)
-class TrainerAdmin(admin.ModelAdmin):
-    list_display = ['id', 'tsport', 'tfull_name', 'tphone']
-    search_field = ['tfull_name']
-    list_filter = ['tsport']
-'''
-'''
-@admin.register(TrainerSeesion)
-class TrainerSessionAdmin(admin.ModelAdmin):
-    list_display = ['id', 'session_trainer', 'dos_trainer', 'class_trainer']
-    search_field = ['session_trainer']
-    list_filter = ['session_trainer']
-'''
-
 @admin.register(Person)
 class PersonAdmin(admin.ModelAdmin):
     #list_display = ['id',  'full_name', "ncode",  "scode",   "dob",
@@ -80,7 +63,7 @@ class SessionDateAdmin(admin.ModelAdmin):
 
 @admin.register(Classi)
 class ClassiAdmin(admin.ModelAdmin):
-    list_display = ['id', 'weekdays', 'cname', 'starttime','ctrainer']
+    list_display = ['id', 'weekdays', 'cname', 'starttime','ctrainer','fee']
     form = ClassiForm
     search_fields = ['session_person']
 

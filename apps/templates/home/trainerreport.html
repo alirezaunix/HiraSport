@@ -33,9 +33,8 @@
         پروفایل {{ trainer.full_name }}
       </h1>
       <ol class="breadcrumb">
-        <li><a href="#"><i class="fa fa-dashboard"></i> خانه</a></li>
-        <li><a href="#">مثال ها</a></li>
-        <li class="active"> پروفایل</li>
+        <li><a href="/"><i class="fa fa-dashboard"></i> خانه</a></li>
+        <li class="active"> پروفایل مربی</li>
       </ol>
     </section>
 
@@ -105,7 +104,6 @@
               {% if superuserview %}
               <li><a href="#summary" data-toggle="tab">مجموع حضور </a></li>
               <li><a href="#sessions" data-toggle="tab">گزارش حضور</a></li>
-              <li><a href="#peyments" data-toggle="tab">گزارش پرداخت</a></li>
               {% endif %}
             </ul>
             <div class="tab-content">
@@ -128,6 +126,7 @@
               <!-- /.tab-pane -->
               <div class=" tab-pane" id="summary">
                 <p>تا کنون در ماه {{mont}} تعداد جلسات: {{count }}</p>
+                <p>مجموع حق زحمه در این ماه تا کنون {{ sumOfMounth }}</p>
               </div>
               <!-- /.tab-pane -->
 
@@ -137,37 +136,21 @@
                                 <tr>
                                     <th>ردیف</th>
                                     <th>روز حضور</th>
+                                    <th> تعداد نفرات</th>
                                 </tr>
                                 {% for s in trainerseesion%}
                                 <tr>
                                     <td>{{s.id}}</td>
                                     <td>{{s.dos}}</td>
+                                    <td>{{s.sstudent.all | length}}</td>
+
                                 </tr>
                                 {%endfor%}
                   </table>
                 </div>              
               </div>
               <!-- /.tab-pane -->
-              <div class="tab-pane" id="peyments">
-                <div class="box-body table-responsive no-padding">
-                  <table class="table table-hover">
-                                <tr>
-                                    <th>ردیف</th>
-                                    <th>روز پرداخت</th>
-                                    <th>مقدار پرداخت</th>
-                                    <th>تعداد جلسات شارژ شده</th>
-                                </tr>
-                                {% for s in peyment%}
-                                <tr>
-                                    <td>{{s.id}}</td>
-                                    <td>{{s.dop}}</td>
-                                    <td>{{s.mcharged}}</td>
-                                    <td>{{s.ncharged}}</td>
-                                </tr>
-                                {%endfor%}
-                  </table>
-                </div>              
-             </div>
+            
               <!-- /.tab-pane -->
             </div>
             <!-- /.tab-content -->
