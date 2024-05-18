@@ -1,5 +1,7 @@
     {% csrf_token %}
     {% load static %}
+    {% load jformat %}
+
 
   <!-- Main Sidebar Container -->
  <aside class="main-sidebar">
@@ -19,9 +21,11 @@
           <p>{{ user.username }} </p>
         </div>
       </div>
+      
+
       <!-- sidebar menu: : style can be found in sidebar.less -->
       <ul class="sidebar-menu" data-widget="tree">
-        <li class="header">منو</li>
+        <li class="header" style="color: rgb(82,139,184)"> {{ jdate }}</li>
         <li class="active treeview">
           <a href="#">
             <i class="fa fa-dashboard"></i> <span>داشبرد</span>
@@ -30,7 +34,8 @@
             </span>
           </a>
           <ul class="treeview-menu">
-            <li class="active"><a href="/todayclasslist"><i class="fa fa-circle-o"></i> کلاس های امروز </a></li>
+            <li class="active"><a href="/"><i class="fa fa-circle-o"></i>  خانه  </a></li>
+            <li ><a href="/todayclasslist"><i class="fa fa-circle-o"></i> کلاس های امروز </a></li>
             <li><a href="/admin"><i class="fa fa-circle-o"></i>  ثبت نام و ویرایش</a></li>
             <li><a href="/trainerslist"><i class="fa fa-circle-o"></i>  پنل مربیان   </a></li>
           </ul>

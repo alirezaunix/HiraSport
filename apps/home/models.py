@@ -120,6 +120,8 @@ class Person(AbstractBaseUser):
     t_exp = models.TextField(verbose_name="سوابق تجربی", blank=True)
     t_shortdesc = models.TextField(verbose_name="توضیح کوتاه ", blank=True)
     
+    wallet =models.IntegerField(verbose_name="کیف پول", default=0,blank=True,null=True)
+    
     nextanalysis = models.CharField(
         max_length=20, blank=True,editable=False)
 
@@ -282,6 +284,59 @@ class Peyment(models.Model):
     class Meta:
         verbose_name = "پرداختی"
         verbose_name_plural = "پرداختی ها"
+
+    def __str__(self):
+        return f"{self.peyment_person}"
+
+class Goods(models.Model):
+    id = models.AutoField(primary_key=True, verbose_name='ردیف')
+    gname=models.CharField(verbose_name="نام کالا",max_length=250)
+    gdesc = models.CharField(verbose_name="شرح کالا", max_length=250)
+    gimage = models.ImageField(
+        verbose_name="عکس کالا", null=True, blank=True)
+    #gheymat haghighi?????
+    gprice = models.IntegerField(verbose_name="قیمت کالا",default=0,blank=True,null=True)
+    gstock = models.IntegerField(verbose_name="موجودی کالا",default=0,blank=True,null=True)
+    gdiscount = models.IntegerField(default=0, blank=True, validators=[MinValueValidator(
+        0), MaxValueValidator(100)], verbose_name="درصد تخفیف")
+
+    class Meta:
+        verbose_name = "کالا"
+        verbose_name_plural = "کالا ها"
+
+    def __str__(self):
+        return f"{self.gname}"
+
+
+class GoodsPeyment(models.Model):
+    id = models.AutoField(primary_key=True, verbose_name='ردیف')
+    gpeyment_person = models.ForeignKey(
+        Person, on_delete=models.CASCADE, verbose_name='شخص', blank=True, null=True)
+    gpeyment_dop = jmodels.jDateField(verbose_name="تاریخ پرداخت")
+
+    gpeyment_goods=models.ManyToManyField(
+        Goods,verbose_name="اجناس خریده شده")
+    class Meta:
+        verbose_name = "خرید کالا"
+        verbose_name_plural = "خرید کالا ها"
+
+    def __str__(self):
+        return f"{self.peyment_person}"
+
+
+class WalletCharge(models.Model):
+    id = models.AutoField(primary_key=True, verbose_name='ردیف')
+    walletcharge_person = models.ForeignKey(
+        Person, on_delete=models.CASCADE, verbose_name='شخص', blank=True, null=True)
+    walletcharge_dop = jmodels.jDateField(verbose_name="تاریخ پرداخت")
+    rimage = models.ImageField(
+        verbose_name="عکس فیش پرداختی", null=True, blank=True)
+    walletcharge_charged = models.IntegerField(
+        verbose_name="مقدار پول واریز شده", blank=True, default=0)
+
+    class Meta:
+        verbose_name = "شارژ کیف پول"
+        verbose_name_plural = "  شارژ ها کیف پول"
 
     def __str__(self):
         return f"{self.peyment_person}"

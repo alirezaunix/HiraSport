@@ -42,7 +42,7 @@ class PeymentAdmin(admin.ModelAdmin):
                     "dop", "rimage", "ncharged", "mcharged"]
     form = PeymentForm
     list_filter = ['dop']
-    search_fields = ['peyment_person']
+    search_fields = ['peyment_person__full_name']
 
 
 @admin.register(Insurance)
@@ -51,7 +51,7 @@ class InsuranceAdmin(admin.ModelAdmin):
                     "dop", "rimage", "mcharged", "nextiInsurancedate"]
     form = InsuranceForm
     list_filter = ['dop']
-    search_fields = ['insurance_person']
+    search_fields = ['insurance_person__full_name']
 
 
 @admin.register(SessionDate)
@@ -65,7 +65,7 @@ class SessionDateAdmin(admin.ModelAdmin):
 class ClassiAdmin(admin.ModelAdmin):
     list_display = ['id', 'weekdays', 'cname', 'starttime','ctrainer','fee']
     form = ClassiForm
-    search_fields = ['session_person']
+    search_fields = ['session_person__full_name']
 
 
 @admin.register(Analysis)
@@ -74,13 +74,13 @@ class AnalysisAdmin(admin.ModelAdmin):
     #form = AnalysisForm
     #model = Analysis
     list_filter = ['analysis_person']
-    search_fields = ['analysis_person']
+    search_fields = ['analysis_person__full_name']
 
 
 @admin.register(AbsenceDate)
 class AbsenceDateAdmin(admin.ModelAdmin):
     list_display = ['absent_person', 'doa']
-    search_fields = ['absent_person']
+    search_fields = ['absent_person__full_name']
     list_filter = ['doa']
 
 
@@ -92,13 +92,14 @@ def AbsenceAction(instance, **kwargs):
     current_value = list(person_obj.values())[0]['rsession']
     person_obj.update(rsession=current_value-1)
 
-
+##
 @receiver(post_save, sender=Peyment)
-def PeymentAction(instance, **kwargs):
-    person_obj = Person.objects.filter(full_name__contains=str(instance.peyment_person).split(
+def PeymentAction(instance,created, **kwargs):
+    if created:
+        person_obj = Person.objects.filter(full_name__contains=str(instance.peyment_person).split(
         " ")[0])
-    current_value = list(person_obj.values())[0]['rsession']
-    person_obj.update(rsession=current_value+instance.ncharged)
+        current_value = list(person_obj.values())[0]['rsession']
+        person_obj.update(rsession=current_value+instance.ncharged)
 
 
 @receiver(post_save, sender=Insurance)

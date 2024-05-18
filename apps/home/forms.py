@@ -7,7 +7,7 @@ class PeymentForm(forms.ModelForm):
     class Meta:
         model = Peyment
         fields = ( 'dop','peyment_person','rimage','ncharged','mcharged')
-        search_fields = ['peyment_person']
+        search_fields = ['peyment_person__full_name']
 
         widgets = {
             'peyment_person': autocomplete.ModelSelect2(url='select2_fk'),
@@ -19,7 +19,7 @@ class InsuranceForm(forms.ModelForm):
         model = Insurance
         fields = ('dop', 'insurance_person', 'rimage',
                    'mcharged', 'nextiInsurancedate')
-        search_fields = ['dop', 'insurance_person']
+        search_fields = ['dop', 'insurance_person__full_name']
 
         widgets = {
             'insurance_person': autocomplete.ModelSelect2(url='select2_fk'),
@@ -31,7 +31,7 @@ class SessionForm(forms.ModelForm):
     class Meta:
         model=SessionDate
         fields=('dos','session_person','classname')
-        search_fields=['dos','session_person']
+        search_fields = ['dos', 'session_person__full_name']
 
         widgets = {
             'session_person': autocomplete.ModelSelect2(url='select2_fk'), 

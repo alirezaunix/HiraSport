@@ -104,6 +104,7 @@ def todayclasslist(request):
 @login_required(login_url="/login/")
 def debt(request):
     context = {'segment': 'index'}
+    context['jdate'] = date_maker()
     person = Person.objects.all()
     context['person'] = person
     html_template = loader.get_template('home/debt.html')
@@ -113,6 +114,8 @@ def debt(request):
 @login_required(login_url="/login/")
 def analyzereport(request):
     context = {'segment': 'index'}
+    context['jdate'] = date_maker()
+
     analyze = Analysis.objects.all()
     context['analyze'] = analyze
     html_template = loader.get_template('home/analyzereport.html')
@@ -128,7 +131,6 @@ def classlist(request, ccname):
         print(request.POST)
         for item in request.POST:
             if 'status' in item:
-                print("$$$$$$$$$$$",item)
                 person_id = request.POST[item].split("_")[-1]
                 person = Person.objects.get(full_name=person_id)
                 if request.POST[item].split("_")[0] == 'present':
@@ -162,6 +164,8 @@ def classlist(request, ccname):
     for obj in Person.objects.filter(role='trainer'):
         trainers.append(obj)
     context['trainers']=trainers
+    context['jdate'] = date_maker()
+
     html_template = loader.get_template('home/classlist.html')
     return HttpResponse(html_template.render(context, request))
 
@@ -215,6 +219,7 @@ def personalreport(request, person_id):
         context.update({"weight": weight, "bfm": bfm,
                        "smm": smm, })
 ###############################
+        context['jdate'] = date_maker()
 
         html_template = loader.get_template('home/personalreport.html')
         return HttpResponse(html_template.render(context, request))
@@ -248,6 +253,8 @@ def trainerreport(request, trainer_id):
         context['count']=count
         context['sumOfMounth']=sumi/2
         context['superuserview'] = True if request.user.is_superuser or request.user.role=="trainer" else False
+        context['jdate'] = date_maker()
+
         html_template = loader.get_template('home/trainerreport.html')
         return HttpResponse(html_template.render(context, request))
 '''
@@ -282,7 +289,7 @@ def trainerslist(request):
         context['2'] = "bg-yellow"
         context['3'] = "bg-aqua"
         context['4'] = "bg-green"
-
+        context['jdate'] = date_maker()
         html_template = loader.get_template('home/trainerslist.html')
         return HttpResponse(html_template.render(context, request))
     
