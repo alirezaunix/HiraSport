@@ -85,38 +85,45 @@ class AbsenceDateAdmin(admin.ModelAdmin):
 
 
 @receiver(post_save, sender=AbsenceDate)
-def AbsenceAction(instance, **kwargs):
-    person_obj = Person.objects.filter(
-        username__contains=str(instance.absent_person).split(" ")[0])
-    n_absence = len(AbsenceDate.objects.all())
-    current_value = list(person_obj.values())[0]['rsession']
-    person_obj.update(rsession=current_value-1)
+def AbsenceAction(instance,created, **kwargs):
+    if created:
+        person_obj = Person.objects.get(
+            pk=instance.absent_person.id)
+        current_value = person_obj.rsession
+        person_obj.rsession=current_value-1
+        person_obj.save()
 
-##
+
 @receiver(post_save, sender=Peyment)
 def PeymentAction(instance,created, **kwargs):
     if created:
-        person_obj = Person.objects.filter(full_name__contains=str(instance.peyment_person).split(
-        " ")[0])
-        current_value = list(person_obj.values())[0]['rsession']
-        person_obj.update(rsession=current_value+instance.ncharged)
+        person_obj = Person.objects.get(
+            pk=instance.peyment_person.id)
+        current_value = person_obj.rsession
+        person_obj.rsession = current_value+instance.ncharged
+        person_obj.save()
 
 
 @receiver(post_save, sender=Insurance)
-def InsuranceAction(instance, **kwargs):
-    person_obj = Person.objects.filter(full_name__contains=str(instance.insurance_person).split(
-        " ")[0])
-    person_obj.update(insurancedate=instance.nextiInsurancedate)
+def InsuranceAction(instance, created, **kwargs):
+    if created:
+        person_obj = Person.objects.get(pk=instance.insurance_person.id)
+        person_obj.insurancedate=instance.nextiInsurancedate
+        person_obj.save()
 
 
 
 
 @receiver(post_save, sender=SessionDate)
-def SessionAction(instance, **kwarg):
-    person_obj = Person.objects.filter(full_name__contains=str(instance.session_person).split(
-        " ")[0])
-    current_value = list(person_obj.values())[0]['rsession']
-    person_obj.update(rsession=current_value-1)
+def SessionAction(instance,created, **kwarg):
+    if created:
+        person_obj = Person.objects.get(
+            pk=instance.session_person.id)
+        current_value = person_obj.rsession
+        person_obj.rsession = current_value-1
+        person_obj.save()
+
+
 
 @receiver(post_save, sender=Person)
 def PersonAction( instance, created, **kwargs):
@@ -130,7 +137,7 @@ def AnalysysAction( instance, created, **kwargs):
     if created:
         try:
             previous_record = Analysis.objects.filter(
-                pk__lt=instance.pk , analysis_person= instance.analysis_person).latest('pk')
+                pk__lt=instance.pk , id= instance.analysis_person.id).latest('pk')
             Analysis.objects.filter(id=instance.pk).update(
                 diffrence_weight = instance.current_state_weight-previous_record.current_state_weight,
                 diffrence_bfm=instance.current_state_bfm-previous_record.current_state_bfm,
@@ -144,7 +151,7 @@ def AnalysysAction( instance, created, **kwargs):
                 diffrence_smm=instance.current_state_smm,
                 diffrence_pbf=instance.current_state_pbf,
             )
-    analysisperson = Analysis.objects.filter(analysis_person=instance.analysis_person).latest('dot')
+    analysisperson = Analysis.objects.filter(id=instance.analysis_person.id).latest('dot')
     print("XxXxXxXxXxXx", analysisperson.dot)
     lastanalysis = str(analysisperson.dot).split("-")
     monti=int(lastanalysis[1])+1
@@ -153,6 +160,6 @@ def AnalysysAction( instance, created, **kwargs):
         monti=monti%12
     else:
         yeari = int(lastanalysis[0])
-    person_obj = Person.objects.filter(full_name__contains=str(instance.analysis_person).split(
-        " ")[0])
-    person_obj.update(nextanalysis=f"{yeari}-{monti}-{lastanalysis[2]}")
+    person_obj = Person.objects.get(id=instance.analysis_person.id)
+    person_obj.nextanalysis=f"{yeari}-{monti}-{lastanalysis[2]}"
+    person_obj.save()

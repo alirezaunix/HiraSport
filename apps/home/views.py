@@ -11,6 +11,8 @@ import jdatetime
 from django.conf.urls.static import static
 from django.conf import settings
 from django.contrib.auth.models import User
+from .forms import AttendanceForm
+from django.forms import formset_factory
 
 
 
@@ -125,39 +127,42 @@ def analyzereport(request):
 
 @login_required(login_url="/login/")
 def classlist(request, ccname):
+    studentList = []
+    students=[]
+    AttendanceFormSet = formset_factory(AttendanceForm, extra=0)
+    for obj in Person.objects.filter(role='student'):
+        if not obj.is_admin:
+            if obj.classname != None and obj.classname.cname == ccname:
+                students.append(obj)
+    formset = AttendanceFormSet(request.POST or None, initial=[
+                                {'name': student.full_name} for student in students])
     if request.method == 'POST':
-        studentList=[]
         cname_obj = Classi.objects.get(cname=ccname)
-        print(request.POST)
-        for item in request.POST:
-            if 'status' in item:
-                person_id = request.POST[item].split("_")[-1]
-                person = Person.objects.get(full_name=person_id)
-                if request.POST[item].split("_")[0] == 'present':
+        print()
+        for student, attendance in request.POST.items():
+            #person_id = request.POST[item].split("_")[-1]
+            if student.isdigit():
+                person = Person.objects.get(id=student)
+                if attendance == 'present':
                     SessionDate.objects.create(
-                        session_person=person, dos=jdatetime.datetime.now() ,classname=cname_obj)
-                elif request.POST[item].split("_")[0] == 'absent':
-                    #person = Person.objects.get(full_name=person_id)
+                        session_person=person, dos=jdatetime.datetime.now(), classname=cname_obj)
+                    studentList.append(person)
+                elif attendance == 'absent':
                     AbsenceDate.objects.create(
-                        absent_person=person, doa=jdatetime.datetime.now(),classname=cname_obj)
-                studentList.append(person)
-            elif "trainer" in item:   
-                fname = request.POST[item].split("_")[-1]
-                trainer=Person.objects.get(full_name=fname)
-                sessionObj=SessionDate.objects.create(
-                    session_person=trainer, dos=jdatetime.datetime.now(), classname=cname_obj)
-        print(studentList)
+                        absent_person=person, doa=jdatetime.datetime.now(), classname=cname_obj)
+                    studentList = []
+        trainer = Person.objects.get(
+            id=request.POST.get("trainer_select"))
+        sessionObj = SessionDate.objects.create(
+        session_person=trainer, dos=jdatetime.datetime.now(), classname=cname_obj)
         for item in studentList:
             sessionObj.sstudent.add(item)
         sessionObj.save()
+        return HttpResponseRedirect(f'/classlist/{ccname}')
+    
             
     context = {'segment': 'classlist'}
     person = []
-    for obj in Person.objects.filter(role='student'):
-        if not obj.is_admin:
-            print("************", obj.classname)
-            if obj.classname != None and obj.classname.cname == ccname:
-                person.append(obj)
     context['person'] = person
     context['cname'] = ccname
     trainers=[]
@@ -165,6 +170,8 @@ def classlist(request, ccname):
         trainers.append(obj)
     context['trainers']=trainers
     context['jdate'] = date_maker()
+    context['formset'] = formset
+    context['students'] = students
 
     html_template = loader.get_template('home/classlist.html')
     return HttpResponse(html_template.render(context, request))

@@ -65,64 +65,39 @@
       </ol>
     </section>
 
-    <!-- Main content -->
     <section class="content">
       <div class="row">
         <div class="col-xs-12">
-          <!-- /.box -->
-
-   <div class="row">
-        <div class="col-xs-12">
-          <div class="box">
-            <div class="box-header">
-              <h3 class="box-title"> لیست نفرات</h3>
-
-              <div class="box-tools">
-                <div class="input-group input-group-sm" style="width: 150px;">
-
-                  
-                </div>
-              </div>
-            </div>
-            <!-- /.box-header -->
-            <div class="box-body table-responsive no-padding">
-                <form id="myForm" method='POST'>
-                {% csrf_token %}
-
               <table class="table table-hover">
                  <tr>
                                 <th>نام و نام خانوادگی</th>
-                                <th>کلاس</th>
-                                <th>تعداد جلسات مانده</th>
                                 <th> حضور و غیاب</th>
+                                <th>تعداد جلسات مانده</th>
 
                 </tr>
-                            {% for p in person %}
-                       
-                                <td><a href='/personalreport/{{p.id}}'</a>{{p.full_name}}</td>
-                                <td>{{p.classname.cname}}</td>
-                            <td>{% if p.rsession < 3 %}   <small style="font-size: 100%;    label.padding: 0.4em 0.6em 0.3em;" class="label pull-right  bg-red">{{p.rsession}}</small> {%elif p.rsession < 6 %}<small style="font-size: 100%;" class="label pull-right bg-yellow">{{p.rsession}}</small>{% else %}<small style="font-size: 100%;" class="label pull-right bg-green">{{p.rsession}}</small>{% endif %}</td>  
-                                <td>
-                                    <input type="radio" id="present" name="status_{{p.full_name}}" class="flat-red" value="present_{{p.full_name}}">
-                                    <label for="html">حاضر&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>                          
-                                    <input type="radio" id="absent" name="status_{{p.full_name}}" class="flat-red" value="absent_{{p.full_name}}">
-                                    <label for="css">غایب</label>
-                                </td>
-                            </tr>
-                            {% endfor %}
+                                <form id="myForm" method="post">
+                                    {% csrf_token %}
+                                    {% for student in students %}
+                  <tr>
+                                            <td><label>{{ student.full_name }} </label></td>
+                                            <td>
+                                              <input type="radio" name="{{ student.id }}"     value="present">حاضر  
+                                              <input type="radio" name="{{ student.id }}" value="absent">غایب                                            <input type="radio" name="{{ student.id }}"     value="validabsent">غیبت مجاز
+                                              <br>
+                                            </td>
+                                            <td>
+                                                {% if student.rsession < 3 %}   <small style="font-size: 100%;    label.padding: 0.4em 0.6em 0.3em;" class="label pull-right  bg-red">{{student.rsession}}</small> {%elif student.rsession < 6 %}<small style="font-size: 100%;" class="label pull-right bg-yellow">{{student.rsession}}</small>{% else %}<small style="font-size: 100%;" class="label pull-right bg-green">{{student.rsession}}</small>{% endif %}
+                                              </td>  
 
-              </table>
-            </div>
-            <!-- /.box-body -->
-          </div>
-          <!-- /.box -->
+                    </tr>
+                                    {% endfor %}          
+                                  </form>
+                                </table>
         </div>
+      </div>
+    </section>
       
-      
-          <!-- /.box -->
-
-        </div>
-        
+      <section>
         <div class="col-xs-12">
           <div class="box">
             <div class="box-header">
@@ -135,32 +110,27 @@
             <!-- /.box-header -->
             <div class="box-body " style="width: 75%;">
               <div class="form-group">
-                <select name="trainer_select" class="form-control select2" style="width: 30%;">
+                <select form="myForm" name="trainer_select" class="form-control select2" style="width: 30%;">
                   {% for trainer in trainers %}
-                  <option value="trainer_{{trainer.full_name}}">{{trainer.full_name}}</option>
+                  <option  value="{{trainer.id}}">{{trainer.full_name}}</option>
                   {% endfor%}
 
                 </select>
               </div>
-            </form>
             </div>
             <!-- /.box-body -->
           </div>
           <!-- /.box -->
         </div>
-        <!-- /.col -->
+      </section>
 
-
-      </div>
-
-      <!-- /.row -->
-    </section>
-    
     <section class="content">
       <div class="callout callout-info">
         <h4>توجه</h4>
+                <p>
 حضور و غیاب همه نفرات را مشخص کنید و سپس مربی را انتخاب و در نهایت دکمه ثبت را بزنید<br>به هیچ عنوان صفحه را رفرش نکنید یا از back استفاده نکنید
-      </div>
+        </p> 
+</div>
 
       <div class="row">
         <div class="col-xs-12">

@@ -58,3 +58,13 @@ class ClassiForm(forms.ModelForm):
         widgets = {
             'starttime' : TimePickerInput(),
         }
+
+
+class AttendanceForm(forms.Form):
+    ATTENDANCE_CHOICES = [
+        ('present', 'Present'),
+        ('absent', 'Absent'),
+        ('validabsent', ' validAbsent ')
+    ]
+    attendance = forms.ChoiceField(
+        choices=ATTENDANCE_CHOICES, widget=forms.RadioSelect)
