@@ -61,6 +61,9 @@ def index(request):
 def todayclasslist(request):
     context = {'segment': 'index'}
     context['jdate'] = date_maker()
+    context['row_data']=Classi.objects.all()
+    
+    '''
     weekday = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat",]
     wday = weekday[jdatetime.datetime.today().weekday()-1]
     currentclasses = {obj.id: obj.weekdays for obj in Classi.objects.filter(
@@ -98,7 +101,7 @@ def todayclasslist(request):
         row_data.append(a_row)
         a_row = {}
     context['row_data'] = row_data
-
+'''
     html_template = loader.get_template('home/todayclasslist.html')
     return HttpResponse(html_template.render(context, request))
 

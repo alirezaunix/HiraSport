@@ -47,6 +47,11 @@ class Classi(models.Model):
     ctrainer = models.ForeignKey(
         "Person", on_delete=models.CASCADE, null=True, blank=True, default=None, verbose_name="مربی کلاس")
     fee=models.IntegerField(default=0,verbose_name=" شهریه ۱۲ جلسه (تومان)",blank=True)
+
+    gender_choice = ('m', 'مرد'), ('f', 'زن')
+    cgender = models.CharField(
+        max_length=1, verbose_name="جنسیت", choices=gender_choice,blank=True,null=True) 
+
     class Meta:
         verbose_name = "کلاس"
         verbose_name_plural = "کلاس ها"

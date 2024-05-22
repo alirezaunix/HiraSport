@@ -65,7 +65,7 @@
         <div class="col-xs-12">
           <div class="box">
             <div class="box-header">
-              <h3 class="box-title">کلاسهای امروز</h3>
+              <h3 class="box-title">لیست کلاس های هفته</h3>
 
               <div class="box-tools">
                 <div class="input-group input-group-sm" style="width: 150px;">
@@ -76,21 +76,30 @@
             </div>
             <!-- /.box-header -->
             <div class="box-body table-responsive no-padding">
-              <table class="table table-hover">
-                 <tr>
+              <table id="example1" class="table table-bordered table-striped ">
+                <thead>  
+                <tr>
                                 <th style="text-align: right;">کلاس</th>
+                                <th style="text-align: right;">روز هفته</th>
+                                <th style="text-align: right;">جنسیت </th>
                                 <th style="text-align: right;">ساعت شروع</th>
+                                <th style="text-align: right;">مربی </th>
                                 <th style="text-align: right;">نفرات</th>
 
                 </tr>
+              </thead>
+              </tbody>
                             {% for row in row_data %}
                             <tr>
-                                <td align="right">{{row.classesname}}</td>
-                                <td align="right">{{row.classesstarttime}}</td>
-                                <td align="right"><a href="/classlist/{{row.classesname}}"><button type="submit"  class="btn  btn-xs  bg-maroon btn-flat ">لیست نفرات </button></a></td>
+                                <td align="right">{{row.cname}}</td>
+                                <td align="right">{{row.weekdays}}</td>
+                                <td align="right">{{row.cgender}}</td>
+                                <td align="right">{{row.starttime}}</td>
+                                <td align="right">{{row.ctrainer}}</td>
+                                <td align="right"><a href="/classlist/{{row.cname}}"><button type="submit"  class="btn  btn-xs  bg-maroon btn-flat ">لیست نفرات </button></a></td>
                             </tr>
                             {% endfor %}
-
+                          </tbody>
               </table>
             </div>
             <!-- /.box-body -->
@@ -124,6 +133,7 @@
   <script src="{{ ASSETS_ROOT }}/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
   <script src="{{ ASSETS_ROOT }}/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
   <script src="{{ ASSETS_ROOT }}/dist/js/pages/dashboard.js"></script>
+<script src="{{ ASSETS_ROOT }}/bower_components/jquery-ui/jquery-ui.min.js"></script>
 
   <!-- AdminLTE App -->
 <script src="{{ ASSETS_ROOT }}/dist/js/adminlte.min.js"></script>
@@ -134,8 +144,13 @@
   <script>
     $(function () {
       $("#example1").DataTable({
+        "paging": false,
         "responsive": true,
-        "autoWidth": false,
+        "autoWidth": true,
+        "ordering": true,
+        "lengthChange": true,
+
+
       });
       $('#example2').DataTable({
         "paging": true,
