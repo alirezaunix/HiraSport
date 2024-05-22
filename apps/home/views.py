@@ -130,6 +130,9 @@ def analyzereport(request):
 
 @login_required(login_url="/login/")
 def classlist(request, ccname):
+    monthname = {"فروردین": "01",  "اردیبهشت": "02",  "خرداد": "03",  "تیر": "04",  "مرداد": "05",
+                 "شهریور": "06",  "مهر": "07",  "آبان": "08",  "آذر": "09",  "دی": "10", "بهمن": "11",  "اسفند": "12"}
+
     studentList = []
     students=[]
     AttendanceFormSet = formset_factory(AttendanceForm, extra=0)
@@ -141,18 +144,25 @@ def classlist(request, ccname):
                                 {'name': student.full_name} for student in students])
     if request.method == 'POST':
         cname_obj = Classi.objects.get(cname=ccname)
-        print()
+        
+        inDate=request.POST.get("date").split(",")
+        print(inDate)
+        di=int(inDate[0])
+        mi = int(monthname[inDate[1]])
+        yi=int(inDate[2])
+        datePost=jdatetime.date(yi,mi,di).togregorian().strftime("%Y-%m-%d")
+        print("*****",datePost)
         for student, attendance in request.POST.items():
             #person_id = request.POST[item].split("_")[-1]
             if student.isdigit():
                 person = Person.objects.get(id=student)
                 if attendance == 'present':
                     SessionDate.objects.create(
-                        session_person=person, dos=jdatetime.datetime.now(), classname=cname_obj)
+                        session_person=person, dos=datePost, classname=cname_obj)
                     studentList.append(person)
                 elif attendance == 'absent':
                     AbsenceDate.objects.create(
-                        absent_person=person, doa=jdatetime.datetime.now(), classname=cname_obj)
+                        absent_person=person, doa=datePost, classname=cname_obj)
                     studentList = []
         trainer = Person.objects.get(
             id=request.POST.get("trainer_select"))
@@ -195,8 +205,7 @@ def personalreport(request, person_id):
 
         context['person'] = person
         context['imglen'] = len(person.simage.name)
-        #l1 = str(person.insurancedate).split("-")
-        #context['nextinsurance']=f"{int(l1[0])+1}-{l1[1]}-{l1[2]}"
+
         context['buttonShow'] = True if request.user.is_superuser else False
         
         session = SessionDate.objects.filter(session_person=person_id)

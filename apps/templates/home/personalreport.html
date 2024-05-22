@@ -54,7 +54,7 @@
               <form method='POST'>
                   {% csrf_token %}
                   {% if buttonShow %}
-                      <button type="submit" name="register" class="btn btn-danger btn-block">کسر یک جلسه</button>
+                      <button onclick="myFunction()" type="submit" name="register" class="btn btn-danger btn-block">کسر یک جلسه</button>
                   {%endif%}
               </form>
             </div>
@@ -353,5 +353,9 @@
     chart.render();
   }
 </script>
-
+<script>
+function myFunction() {
+  alert("اعمال گردید");
+}
+</script>
 {% endblock javascripts %}  

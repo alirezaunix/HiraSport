@@ -152,7 +152,6 @@ def AnalysysAction( instance, created, **kwargs):
                 diffrence_pbf=instance.current_state_pbf,
             )
     analysisperson = Analysis.objects.filter(id=instance.analysis_person.id).latest('dot')
-    print("XxXxXxXxXxXx", analysisperson.dot)
     lastanalysis = str(analysisperson.dot).split("-")
     monti=int(lastanalysis[1])+1
     if monti>12:
@@ -160,6 +159,8 @@ def AnalysysAction( instance, created, **kwargs):
         monti=monti%12
     else:
         yeari = int(lastanalysis[0])
+    
+    print("XxXxXxXxXxXx", analysisperson.dot)
     person_obj = Person.objects.get(id=instance.analysis_person.id)
     person_obj.nextanalysis=f"{yeari}-{monti}-{lastanalysis[2]}"
     person_obj.save()
