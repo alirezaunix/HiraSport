@@ -135,19 +135,23 @@ def PersonAction( instance, created, **kwargs):
 def AnalysysAction( instance, created, **kwargs):
 
     if created:
-   #     try:
-        personID=(instance.analysis_person.id)
-        previous_record = Analysis.objects.filter(
-            analysis_person__pk=personID).order_by('dot').exclude(pk=instance.pk).last()
-        print(previous_record.id)
-        Analysis.objects.filter(id=instance.pk).update(
-                diffrence_weight = instance.current_state_weight-previous_record.current_state_weight,
-                diffrence_bfm=instance.current_state_bfm-previous_record.current_state_bfm,
-                diffrence_smm=instance.current_state_smm-previous_record.current_state_smm,
-                diffrence_pbf=instance.current_state_pbf-previous_record.current_state_pbf,
-            )
- 
-
+        try:
+            personID=(instance.analysis_person.id)
+            previous_record = Analysis.objects.filter(
+                analysis_person__pk=personID).order_by('dot').exclude(pk=instance.pk).last()
+            Analysis.objects.filter(id=instance.pk).update(
+                    diffrence_weight = instance.current_state_weight-previous_record.   current_state_weight,
+                    diffrence_bfm=instance.current_state_bfm-previous_record.current_state_bfm,
+                    diffrence_smm=instance.current_state_smm-previous_record.current_state_smm,
+                    diffrence_pbf=instance.current_state_pbf-previous_record.current_state_pbf,
+                )
+        except:
+            Analysis.objects.filter(id=instance.pk).update(
+            diffrence_weight=instance.current_state_weight,
+            diffrence_bfm=instance.current_state_bfm,
+            diffrence_smm=instance.current_state_smm,
+            diffrence_pbf=instance.current_state_pbf,
+)
         lastanalysis = str(instance.dot).split("-")
         monti = int(lastanalysis[1])+1
         if monti>12:
@@ -162,10 +166,5 @@ def AnalysysAction( instance, created, **kwargs):
 
 '''
         except:
-            Analysis.objects.filter(id=instance.pk).update(
-                diffrence_weight=instance.current_state_weight,
-                diffrence_bfm=instance.current_state_bfm,
-                diffrence_smm=instance.current_state_smm,
-                diffrence_pbf=instance.current_state_pbf,
-            )
+            
             '''
