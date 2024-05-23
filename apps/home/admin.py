@@ -128,22 +128,39 @@ def SessionAction(instance,created, **kwarg):
 @receiver(post_save, sender=Person)
 def PersonAction( instance, created, **kwargs):
     if created:
-        Analysis.objects.create(analysis_person=instance,
-                                dot=jdatetime.datetime.now())
+        Analysis.objects.create(analysis_person=instance,dot=jdatetime.datetime.now())
 
 
 @receiver(post_save, sender=Analysis)
 def AnalysysAction( instance, created, **kwargs):
+
     if created:
-        try:
-            previous_record = Analysis.objects.filter(
-                pk__lt=instance.pk , id= instance.analysis_person.id).latest('pk')
-            Analysis.objects.filter(id=instance.pk).update(
+   #     try:
+        personID=(instance.analysis_person.id)
+        previous_record = Analysis.objects.filter(
+            analysis_person__pk=personID).order_by('dot').exclude(pk=instance.pk).last()
+        print(previous_record.id)
+        Analysis.objects.filter(id=instance.pk).update(
                 diffrence_weight = instance.current_state_weight-previous_record.current_state_weight,
                 diffrence_bfm=instance.current_state_bfm-previous_record.current_state_bfm,
                 diffrence_smm=instance.current_state_smm-previous_record.current_state_smm,
                 diffrence_pbf=instance.current_state_pbf-previous_record.current_state_pbf,
             )
+ 
+
+        lastanalysis = str(instance.dot).split("-")
+        monti = int(lastanalysis[1])+1
+        if monti>12:
+            yeari=int(lastanalysis[0])+1
+            monti=monti%12
+        else:
+            yeari = int(lastanalysis[0])
+        
+        person_obj = Person.objects.get(id=instance.analysis_person.id)
+        person_obj.nextanalysis=f"{yeari}-{monti}-{lastanalysis[2]}"
+        person_obj.save()
+
+'''
         except:
             Analysis.objects.filter(id=instance.pk).update(
                 diffrence_weight=instance.current_state_weight,
@@ -151,16 +168,4 @@ def AnalysysAction( instance, created, **kwargs):
                 diffrence_smm=instance.current_state_smm,
                 diffrence_pbf=instance.current_state_pbf,
             )
-    analysisperson = Analysis.objects.filter(id=instance.analysis_person.id).latest('dot')
-    lastanalysis = str(analysisperson.dot).split("-")
-    monti=int(lastanalysis[1])+1
-    if monti>12:
-        yeari=int(lastanalysis[0])+1
-        monti=monti%12
-    else:
-        yeari = int(lastanalysis[0])
-    
-    print("XxXxXxXxXxXx", analysisperson.dot)
-    person_obj = Person.objects.get(id=instance.analysis_person.id)
-    person_obj.nextanalysis=f"{yeari}-{monti}-{lastanalysis[2]}"
-    person_obj.save()
+            '''

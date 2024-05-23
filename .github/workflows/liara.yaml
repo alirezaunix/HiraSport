@@ -30,11 +30,3 @@ jobs:
         npm i -g @liara/cli@5
         liara deploy --app="hesam1" --api-token="$LIARA_TOKEN" --no-app-logs
 
-    - name: Migrations
-      run: | 
-        python3 manage.py makemigrations 
-        python3 manage.py migrate
-        python3 manage.py collectstatic --noinput
-        cp -a dbdisk/bower_components staticfiles/assets/
-
-
