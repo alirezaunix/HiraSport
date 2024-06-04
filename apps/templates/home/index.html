@@ -138,11 +138,67 @@
         </div>
         <!-- ./col -->
       </div>
-      <!-- /.row -->
-           <div class="row">
+
+
+
+      <div class="row">
         <div class="col-xs-12">
           <!-- /.box -->
+          <div class="box">
+            <div class="box-header">
+              <h3 class="box-title"> لیست کلاس های امروز </h3>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+              <table id="example1" class="table table-bordered table-striped ">
+                <thead>
+                <tr>
+                  <th> ردیف</th>
+                  <th>کلاس</th>
+                  <th>ساعت شروع<</th>
+                  <th> جنسیت</th>
+                </tr> 
+                </thead>
+                <tbody>
+                        {% for p in currentclasses %}
+                              <td align="right">{{p.cname}} </td>
+                              <td align="right">{{p.weekdays}}</td>
+                              <td align="right">{{p.starttime}}</td>
+                              {% if p.cgender == "m" %}                                
+                                              <td align="right"> آقایان  </td>
+                              {% else %}
+                                              <td align="right"> خانم ها  </td>
+                              {% endif %}                            
+                            </tr>
+                        {% endfor %}
 
+                </tbody>
+                <tfoot>
+                <tr>
+                  <th> ردیف</th>
+                  <th>کلاس</th>
+                  <th>ساعت شروع<</th>
+                  <th> جنسیت</th>
+                </tr>
+                </tfoot>
+              </table>
+            </div>
+            <!-- /.box-body -->
+          </div>
+          <!-- /.box -->
+        </div>
+        <!-- /.col -->
+      </div>
+
+
+
+
+
+
+      <!-- /.row -->
+      <div class="row">
+        <div class="col-xs-12">
+          <!-- /.box -->
           <div class="box">
             <div class="box-header">
               <h3 class="box-title"> لیست همه نفرات </h3>

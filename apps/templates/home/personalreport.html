@@ -1,5 +1,7 @@
 {% extends "layouts/base.html" %}
 
+{% load custom_filters %}
+
 {% block title %} Profile {% endblock %} 
 
 <!-- Element injected in the BODY element -->
@@ -24,6 +26,9 @@
 {% endblock stylesheets %}
 
 {% block content %}  
+
+
+
 
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -69,17 +74,22 @@
             </div>
             <!-- /.box-header -->
             <div class="box-body">
-              
-              
+
+              <strong>  نام و نام خانوادگی</strong>
+              <p class="text-muted">
+                  {{person.full_name}}
+              </p>
+
+
+
+              <hr>
               <strong> تاریخ تولد</strong>
               <p class="text-muted">
                   {{person.dob}}
               </p>
 
               <hr>
-
               <strong> جنسیت</strong>
-
               {% if person.gender == "m" %}                                
                   <p class="text-muted"> مرد </p>
               {% else %}
@@ -254,14 +264,14 @@
                                 <tr>
                                     <th>ردیف</th>
                                     <th>روز پرداخت</th>
-                                    <th>مقدار پرداخت</th>
+                                    <th>مقدار پرداخت به تومان</th>
                                     <th>تعداد جلسات شارژ شده</th>
                                 </tr>
                                 {% for s in peyment%}
                                 <tr>
                                     <td>{{s.id}}</td>
                                     <td>{{s.dop}}</td>
-                                    <td>{{s.mcharged}}</td>
+                                    <td> {{s.mcharged | format_money }}</td>
                                     <td>{{s.ncharged}}</td>
                                 </tr>
                                 {%endfor%}
@@ -358,4 +368,7 @@ function myFunction() {
   alert("اعمال گردید");
 }
 </script>
+
 {% endblock javascripts %}  
+
+

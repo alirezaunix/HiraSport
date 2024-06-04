@@ -93,7 +93,11 @@
                             <tr>
                                 <td align="right">{{row.cname}}</td>
                                 <td align="right">{{row.weekdays}}</td>
-                                <td align="right">{{row.cgender}}</td>
+                                              {% if row.cgender == "m" %}                                
+                                              <td align="right"> آقایان  </td>
+                                              {% else %}
+                                              <td align="right"> خانم ها  </td>
+                                              {% endif %}
                                 <td align="right">{{row.starttime}}</td>
                                 <td align="right">{{row.ctrainer}}</td>
                                 <td align="right"><a href="/classlist/{{row.cname}}"><button type="submit"  class="btn  btn-xs  bg-maroon btn-flat ">لیست نفرات </button></a></td>

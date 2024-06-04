@@ -6,3 +6,27 @@
         python3 manage.py collectstatic --noinput
         cp -a dbdisk/bower_components staticfiles/assets/
 
+
+
+#todo: toye class har nafar click beshe profilesh baz beshe +OK
+#todo: format poli ba momayez toman +OK
+#todo: to ye roz hozor nafar yek bar faghd bashad
+# taghir password baraye karbar
+#Todo: back color trainer ha moshkhas tar  +OK
+#Todo: range tarigh baraye dastmozd morabi +OK
+# varzeshga -> bashgah +OK
+
+#dar safhe asli list kelasse emroz bashe va  +OK
+#jensyat class be sorat farsi +OK
+
+
+
+#theme:
+https://github.com/aliatayee/Attendance_Management_System
+
+#sms:
+# sms be ezaye 1 jalase mande 
+# tedade in ghadr charge carde dar tarikh moshakhas
+# tavalod 
+# takhfif va 
+# etela resani ha

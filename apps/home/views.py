@@ -13,7 +13,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from .forms import AttendanceForm
 from django.forms import formset_factory
-
+import datetime
 
 
 def date_maker():
@@ -45,6 +45,11 @@ def index(request):
         context['jdate'] = date_maker()
         person = Person.objects.filter(role="student")
         context['person'] = person
+        weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun",]
+        wday = weekdays[datetime.datetime.today().weekday()]
+        currentclasses = {obj : obj.weekdays for obj in Classi.objects.filter(
+            weekdays__contains=wday)}
+        context['currentclasses'] = currentclasses
         html_template = loader.get_template('home/index.html')
         return HttpResponse(html_template.render(context, request))
     elif request.user.role=="student":
@@ -64,7 +69,7 @@ def todayclasslist(request):
     context['row_data']=Classi.objects.all()
     
     '''
-    weekday = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat",]
+    weekday = [ "Mon", "Tue", "Wed", "Thu", "Fri", "Sat","Sun",]
     wday = weekday[jdatetime.datetime.today().weekday()-1]
     currentclasses = {obj.id: obj.weekdays for obj in Classi.objects.filter(
         weekdays__contains=wday)}
@@ -219,11 +224,13 @@ def personalreport(request, person_id):
         
         analysis=Analysis.objects.filter(analysis_person=person_id)       
         context["analysis"] = analysis
-       
-        classiname=Classi.objects.get(cname=person.classname)
-        context['trainer_id'] = Person.objects.get(
-            full_name=classiname.ctrainer).id
-        
+        try:
+            classiname=Classi.objects.get(cname=person.classname)
+            context['trainer_id'] = Person.objects.get(
+                full_name=classiname.ctrainer).id
+        except:
+            print("*******^^^^^^^^^***********")
+            pass
         weight=[]
         bfm=[]
         smm=[]
@@ -286,13 +293,12 @@ def trainerreport(request, trainer_id):
 @login_required(login_url="/login/")
 def trainerslist(request):
         colorbg=[
-        "bg-red",
         "bg-yellow",
         "bg-aqua",
-        "bg-blue",
-        "bg-light-blue",
-        "bg-green",
-        "bg-navy",
+        #"bg-silver",
+        #"bg-light-blue",
+        #"bg-light-green",
+        #"bg-navy",
         "bg-teal",
         "bg-olive",
         "bg-lime",
