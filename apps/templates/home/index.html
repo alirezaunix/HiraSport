@@ -155,8 +155,10 @@
                 <tr>
                   <th> ردیف</th>
                   <th>کلاس</th>
-                  <th>ساعت شروع<</th>
+                  <th>ساعت شروع</th>
                   <th> جنسیت</th>
+                  <th>نفرات</th>
+
                 </tr> 
                 </thead>
                 <tbody>
@@ -169,16 +171,19 @@
                               {% else %}
                                               <td align="right"> خانم ها  </td>
                               {% endif %}                            
+                              <td align="right"><a href="/classlist/{{p.cname}}"><button type="submit"  class="btn  btn-xs  bg-maroon btn-flat ">لیست نفرات </button></a></td>
                             </tr>
-                        {% endfor %}
-
+                            {% endfor %}
+                              
                 </tbody>
                 <tfoot>
                 <tr>
                   <th> ردیف</th>
                   <th>کلاس</th>
-                  <th>ساعت شروع<</th>
+                  <th>ساعت شروع</th>
                   <th> جنسیت</th>
+                  <th>نفرات</th>
+
                 </tr>
                 </tfoot>
               </table>

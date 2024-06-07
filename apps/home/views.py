@@ -64,11 +64,11 @@ def index(request):
 
 @login_required(login_url="/login/")
 def todayclasslist(request):
-    context = {'segment': 'index'}
-    context['jdate'] = date_maker()
-    context['row_data']=Classi.objects.all()
-    
-    '''
+    if request.user.is_superuser:
+        context = {'segment': 'index'}
+        context['jdate'] = date_maker()
+        context['row_data']=Classi.objects.all()
+        '''
     weekday = [ "Mon", "Tue", "Wed", "Thu", "Fri", "Sat","Sun",]
     wday = weekday[jdatetime.datetime.today().weekday()-1]
     currentclasses = {obj.id: obj.weekdays for obj in Classi.objects.filter(
@@ -107,76 +107,79 @@ def todayclasslist(request):
         a_row = {}
     context['row_data'] = row_data
 '''
-    html_template = loader.get_template('home/todayclasslist.html')
-    return HttpResponse(html_template.render(context, request))
+        html_template = loader.get_template('home/todayclasslist.html')
+        return HttpResponse(html_template.render(context, request))
 
 
 @login_required(login_url="/login/")
 def debt(request):
-    context = {'segment': 'index'}
-    context['jdate'] = date_maker()
-    person = Person.objects.all()
-    context['person'] = person
-    html_template = loader.get_template('home/debt.html')
-    return HttpResponse(html_template.render(context, request))
+    if request.user.is_superuser:
+        context = {'segment': 'index'}
+        context['jdate'] = date_maker()
+        person = Person.objects.all()
+        context['person'] = person
+        html_template = loader.get_template('home/debt.html')
+        return HttpResponse(html_template.render(context, request))
 
 
 @login_required(login_url="/login/")
 def analyzereport(request):
-    context = {'segment': 'index'}
-    context['jdate'] = date_maker()
+    if request.user.is_superuser:
 
-    analyze = Analysis.objects.all()
-    context['analyze'] = analyze
-    html_template = loader.get_template('home/analyzereport.html')
-    return HttpResponse(html_template.render(context, request))
+        context = {'segment': 'index'}
+        context['jdate'] = date_maker()
+        analyze = Analysis.objects.all()
+        context['analyze'] = analyze
+        html_template = loader.get_template('home/analyzereport.html')
+        return HttpResponse(html_template.render(context, request))
 
 
 
 @login_required(login_url="/login/")
 def classlist(request, ccname):
-    monthname = {"فروردین": "01",  "اردیبهشت": "02",  "خرداد": "03",  "تیر": "04",  "مرداد": "05",
-                 "شهریور": "06",  "مهر": "07",  "آبان": "08",  "آذر": "09",  "دی": "10", "بهمن": "11",  "اسفند": "12"}
+    if request.user.is_superuser:
+        monthname = {"فروردین": "01",  "اردیبهشت": "02",  "خرداد": "03",  "تیر": "04",  "مرداد": "05",
+                    "شهریور": "06",  "مهر": "07",  "آبان": "08",  "آذر": "09",  "دی": "10", "بهمن": "11",  "اسفند": "12"}
 
-    studentList = []
-    students=[]
-    AttendanceFormSet = formset_factory(AttendanceForm, extra=0)
-    for obj in Person.objects.filter(role='student'):
-        if not obj.is_admin:
-            if obj.classname != None and obj.classname.cname == ccname:
-                students.append(obj)
-    formset = AttendanceFormSet(request.POST or None, initial=[
-                                {'name': student.full_name} for student in students])
-    if request.method == 'POST':
-        cname_obj = Classi.objects.get(cname=ccname)
-        
-        inDate=request.POST.get("date").split(",")
-        print(inDate)
-        di=int(inDate[0])
-        mi = int(monthname[inDate[1]])
-        yi=int(inDate[2])
-        datePost=jdatetime.date(yi,mi,di).togregorian().strftime("%Y-%m-%d")
-        print("*****",datePost)
-        for student, attendance in request.POST.items():
-            #person_id = request.POST[item].split("_")[-1]
-            if student.isdigit():
-                person = Person.objects.get(id=student)
-                if attendance == 'present':
-                    SessionDate.objects.create(
-                        session_person=person, dos=datePost, classname=cname_obj)
-                    studentList.append(person)
-                elif attendance == 'absent':
-                    AbsenceDate.objects.create(
-                        absent_person=person, doa=datePost, classname=cname_obj)
-                    studentList = []
-        trainer = Person.objects.get(
-            id=request.POST.get("trainer_select"))
-        sessionObj = SessionDate.objects.create(
-        session_person=trainer, dos=jdatetime.datetime.now(), classname=cname_obj)
-        for item in studentList:
-            sessionObj.sstudent.add(item)
-        sessionObj.save()
-        return HttpResponseRedirect(f'/classlist/{ccname}')
+        studentList = []
+        students=[]
+        AttendanceFormSet = formset_factory(AttendanceForm, extra=0)
+        for obj in Person.objects.filter(role='student'):
+            if not obj.is_admin:
+                if obj.classname != None and obj.classname.cname == ccname:
+                    students.append(obj)
+        formset = AttendanceFormSet(request.POST or None, initial=[
+                                    {'name': student.full_name} for student in students])
+        if request.method == 'POST':
+            cname_obj = Classi.objects.get(cname=ccname)
+            
+            inDate=request.POST.get("date").split(",")
+            print(inDate)
+            di=int(inDate[0])
+            mi = int(monthname[inDate[1]])
+            yi=int(inDate[2])
+            datePost=jdatetime.date(yi,mi,di).togregorian().strftime("%Y-%m-%d")
+            print("*****",datePost)
+            for student, attendance in request.POST.items():
+                #person_id = request.POST[item].split("_")[-1]
+                if student.isdigit():
+                    person = Person.objects.get(id=student)
+                    if attendance == 'present':
+                        SessionDate.objects.create(
+                            session_person=person, dos=datePost, classname=cname_obj)
+                        studentList.append(person)
+                    elif attendance == 'absent':
+                        AbsenceDate.objects.create(
+                            absent_person=person, doa=datePost, classname=cname_obj)
+                        studentList = []
+            trainer = Person.objects.get(
+                id=request.POST.get("trainer_select"))
+            sessionObj = SessionDate.objects.create(
+            session_person=trainer, dos=jdatetime.datetime.now(), classname=cname_obj)
+            for item in studentList:
+                sessionObj.sstudent.add(item)
+            sessionObj.save()
+            return HttpResponseRedirect(f'/classlist/{ccname}')
     
             
     context = {'segment': 'classlist'}
@@ -257,66 +260,68 @@ def personalreport(request, person_id):
 
 @login_required(login_url="/login/")
 def trainerreport(request, trainer_id):
-        count=0
-        trainer = Person.objects.get(id=trainer_id)
-        trainerseesion = SessionDate.objects.filter(session_person=trainer_id)
-        mont=(str(jdatetime.datetime.now()).split("-")[1])     
-        sumi=0
-        
-        for item in trainerseesion:
-            discounts = 0
-            if f"-{mont}-" in str(item.dos):
-                count+=1
-            for i in item.sstudent.all():
-                discounts+=i.discount
-            sumi+=(item.classname.fee/12*len(item.sstudent.all()) -
-                  discounts*(item.classname.fee/12)/100)
-        print(sumi/2)
-        context = {'segment': 'trainerreport'}
-        context['trainer'] = trainer
-        context['trainerseesion'] = trainerseesion
-        context['mont']=mont
-        context['count']=count
-        context['sumOfMounth']=sumi/2
-        context['superuserview'] = True if request.user.is_superuser or request.user.role=="trainer" else False
-        context['jdate'] = date_maker()
+    #if request.user.is_superuser:
+            count=0
+            trainer = Person.objects.get(id=trainer_id)
+            trainerseesion = SessionDate.objects.filter(session_person=trainer_id)
+            mont=(str(jdatetime.datetime.now()).split("-")[1])     
+            sumi=0
+            
+            for item in trainerseesion:
+                discounts = 0
+                if f"-{mont}-" in str(item.dos):
+                    count+=1
+                for i in item.sstudent.all():
+                    discounts+=i.discount
+                sumi+=(item.classname.fee/12*len(item.sstudent.all()) -
+                    discounts*(item.classname.fee/12)/100)
+            print(sumi/2)
+            context = {'segment': 'trainerreport'}
+            context['trainer'] = trainer
+            context['trainerseesion'] = trainerseesion
+            context['mont']=mont
+            context['count']=count
+            context['sumOfMounth']=sumi/2
+            context['superuserview'] = True if request.user.is_superuser or request.user.role=="trainer" else False
+            context['jdate'] = date_maker()
 
-        html_template = loader.get_template('home/trainerreport.html')
-        return HttpResponse(html_template.render(context, request))
+            html_template = loader.get_template('home/trainerreport.html')
+            return HttpResponse(html_template.render(context, request))
 '''
-    else:
-        context = {}
-        html_template = loader.get_template('home/page-404.html')
-        return HttpResponse(html_template.render(context, request))
-'''
+        else:
+            context = {}
+            html_template = loader.get_template('home/page-404.html')
+            return HttpResponse(html_template.render(context, request))
+    '''
 
 @login_required(login_url="/login/")
 def trainerslist(request):
-        colorbg=[
-        "bg-yellow",
-        "bg-aqua",
-        #"bg-silver",
-        #"bg-light-blue",
-        #"bg-light-green",
-        #"bg-navy",
-        "bg-teal",
-        "bg-olive",
-        "bg-lime",
-        "bg-orange",
-        "bg-fuchsia",
-        ]
-        
-        trainers = Person.objects.filter(role="trainer")
-        context = {'segment': 'trainerslist'}
-        context['trainers'] = trainers
-        context['colorbg'] = colorbg
-        context['1'] = "bg-red"
-        context['2'] = "bg-yellow"
-        context['3'] = "bg-aqua"
-        context['4'] = "bg-green"
-        context['jdate'] = date_maker()
-        html_template = loader.get_template('home/trainerslist.html')
-        return HttpResponse(html_template.render(context, request))
+    if request.user.is_superuser:
+            colorbg=[
+            "bg-yellow",
+            "bg-aqua",
+            #"bg-silver",
+            #"bg-light-blue",
+            #"bg-light-green",
+            #"bg-navy",
+            "bg-teal",
+            "bg-olive",
+            "bg-lime",
+            "bg-orange",
+            "bg-fuchsia",
+            ]
+            
+            trainers = Person.objects.filter(role="trainer")
+            context = {'segment': 'trainerslist'}
+            context['trainers'] = trainers
+            context['colorbg'] = colorbg
+            context['1'] = "bg-red"
+            context['2'] = "bg-yellow"
+            context['3'] = "bg-aqua"
+            context['4'] = "bg-green"
+            context['jdate'] = date_maker()
+            html_template = loader.get_template('home/trainerslist.html')
+            return HttpResponse(html_template.render(context, request))
     
 
 @login_required(login_url="/login/")
