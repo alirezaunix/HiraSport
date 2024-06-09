@@ -123,6 +123,8 @@
 
               
             </div>
+
+            {% if user.is_superuser %}
               <!-- /.tab-pane -->
               <div class=" tab-pane" id="summary">
                 <p>تا کنون در ماه {{mont}} تعداد جلسات: {{count }}</p>
@@ -149,6 +151,9 @@
                   </table>
                 </div>              
               </div>
+            {% endif %}
+
+
               <!-- /.tab-pane -->
             
               <!-- /.tab-pane -->

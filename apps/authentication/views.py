@@ -2,8 +2,12 @@
 # Create your views here.
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login,logout
-from .forms import LoginForm, SignUpForm 
+from .forms import LoginForm, SignUpForm ,MyPasswordChangeForm
 from django.http import HttpResponse
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.forms import PasswordChangeForm
+from django.http import HttpResponse, HttpResponseRedirect
+
 
 
 def login_view(request):
@@ -55,3 +59,23 @@ def register_user(request):
 def logout_view(request):
     logout(request)
     return HttpResponse(login_view)
+
+
+
+def change_password(request):
+    if request.method == 'POST':
+        form = MyPasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            request.user.changeFlag=10
+            user = form.save()
+            update_session_auth_hash(request, user) 
+            return redirect('change_password_done')
+    else:
+        form = MyPasswordChangeForm(request.user)
+    return render(request, 'accounts/change_password.html', {
+        'form': form
+    })
+
+
+def change_password_done(request):
+    return render(request,'accounts/change_password_done.html')

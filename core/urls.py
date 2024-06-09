@@ -13,6 +13,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),          # Django admin route
     # Auth routes - login / register
     path("", include("apps.authentication.urls")),
+    path('accounts/',include('django.contrib.auth.urls')),
 
     # ADD NEW Routes HERE
 

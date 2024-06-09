@@ -124,7 +124,7 @@ class Person(AbstractBaseUser):
     t_edu = models.TextField(verbose_name="میزان تحصیلات", blank=True)
     t_exp = models.TextField(verbose_name="سوابق تجربی", blank=True)
     t_shortdesc = models.TextField(verbose_name="توضیح کوتاه ", blank=True)
-    
+    changeFlag=models.IntegerField(blank=True,default=0)
     wallet =models.IntegerField(verbose_name="کیف پول", default=0,blank=True,null=True)
     
     nextanalysis = models.CharField(
@@ -165,7 +165,11 @@ class Person(AbstractBaseUser):
     def save(self, *args, **kwargs):
         #self.full_name = f"{self.first_name} {self.last_name}"
         if (not self.is_superuser and self.pk is None ) or  self.password != self.__original_password:
-            self.set_password(self.password)
+            if self.changeFlag!=10:
+                self.set_password(self.password)
+                self.changeFlag=0
+            print(self.password )
+            print(self.__original_password)
         self.is_superuser = True if self.role == 'employee' else False
         super().save(*args, **kwargs)
 
