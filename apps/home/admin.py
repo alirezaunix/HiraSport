@@ -2,7 +2,7 @@
 
 from django.contrib.auth.models import User
 from django.contrib import admin
-from .models import Person, SportField, Peyment, SessionDate, Classi, AbsenceDate, Analysis, Insurance
+from .models import Person, SportField, Peyment, SessionDate, Classi, AbsenceDate, Analysis, ValidAbsenceDate,Insurance
 from django.db.models.signals import post_save
 from .forms import PeymentForm, SessionForm, ClassiForm, InsuranceForm  # AnalysisForm
 from django.dispatch import receiver
@@ -79,9 +79,16 @@ class AnalysisAdmin(admin.ModelAdmin):
 
 @admin.register(AbsenceDate)
 class AbsenceDateAdmin(admin.ModelAdmin):
-    list_display = ['absent_person', 'doa']
+    list_display = ['id','absent_person', 'doa']
     search_fields = ['absent_person__full_name']
     list_filter = ['doa']
+
+##
+@admin.register(ValidAbsenceDate)
+class ValidAbsenceDateAdmin(admin.ModelAdmin):
+    list_display = ['id','vabsent_person', 'dova']
+    search_fields = ['vabsent_person__full_name']
+    list_filter = ['dova']
 
 
 @receiver(post_save, sender=AbsenceDate)
@@ -164,7 +171,3 @@ def AnalysysAction( instance, created, **kwargs):
         person_obj.nextanalysis=f"{yeari}-{monti}-{lastanalysis[2]}"
         person_obj.save()
 
-'''
-        except:
-            
-            '''

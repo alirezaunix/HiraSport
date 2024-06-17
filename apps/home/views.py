@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 from django.urls import reverse
-from .models import Person, Classi, SessionDate, Peyment, AbsenceDate, Analysis
+from .models import Person, Classi, SessionDate, Peyment, AbsenceDate, Analysis,ValidAbsenceDate
 from dal import autocomplete
 import jdatetime
 from django.conf.urls.static import static
@@ -171,6 +171,10 @@ def classlist(request, ccname):
                     elif attendance == 'absent':
                         AbsenceDate.objects.create(
                             absent_person=person, doa=datePost, classname=cname_obj)
+                    elif attendance == 'vabsent':
+                        ValidAbsenceDate.objects.create(
+                            vabsent_person=person, dova=datePost, classname=cname_obj)
+
                         studentList = []
             trainer = Person.objects.get(
                 id=request.POST.get("trainer_select"))
@@ -202,10 +206,6 @@ def classlist(request, ccname):
 def personalreport(request, person_id):
     if str(request.user.username) == Person.objects.get(id=person_id).username or request.user.is_superuser:
         person_id = (request.path.split('/')[-1])
-        if request.method == 'POST':
-            person = Person.objects.get(id=person_id)
-            SessionDate.objects.create(
-                session_person=person, dos=jdatetime.datetime.now())
         
         person = Person.objects.get(id=person_id)
 
@@ -213,14 +213,17 @@ def personalreport(request, person_id):
 
         context['person'] = person
         context['imglen'] = len(person.simage.name)
-
-        context['buttonShow'] = True if request.user.is_superuser else False
         
         session = SessionDate.objects.filter(session_person=person_id)
         context['session'] = session
 
         absence = AbsenceDate.objects.filter(absent_person=person_id)
         context['absence'] = absence
+
+        vabsence = ValidAbsenceDate.objects.filter(vabsent_person=person_id)
+        context['vabsence'] = vabsence
+
+
 
         peyment = Peyment.objects.filter(peyment_person=person_id)
         context['peyment'] = peyment
@@ -232,7 +235,6 @@ def personalreport(request, person_id):
             context['trainer_id'] = Person.objects.get(
                 full_name=classiname.ctrainer).id
         except:
-            print("*******^^^^^^^^^***********")
             pass
         weight=[]
         bfm=[]

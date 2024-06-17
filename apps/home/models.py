@@ -233,6 +233,21 @@ class AbsenceDate(models.Model):
     def __str__(self):
         return f"{self.absent_person} {self.doa}"
 
+class ValidAbsenceDate(models.Model):
+    id = models.AutoField(primary_key=True, verbose_name='ردیف')
+    classname = models.ForeignKey(
+        Classi, on_delete=models.CASCADE, null=True, blank=True, default=None, verbose_name="کلاس")
+    vabsent_person = models.ForeignKey(
+        Person, on_delete=models.CASCADE, verbose_name='شخص')
+    dova = jmodels.jDateField(verbose_name=" تاریخ غیبت مجاز")
+
+    class Meta:
+        verbose_name = "غیبت مجاز"
+        verbose_name_plural = "غیبتهای مجاز"
+
+    def __str__(self):
+        return f"{self.vabsent_person} {self.dova}"
+
 
 class Analysis (models.Model):
     id = models.AutoField(primary_key=True, verbose_name='ردیف')
