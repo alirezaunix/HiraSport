@@ -262,16 +262,16 @@ class Analysis (models.Model):
     current_state_smm = models.FloatField(
         verbose_name="وضعیت موجود - عضله ", default=0)
     current_state_pbf = models.FloatField(
-        verbose_name="وضعیت موجود - درصد چربی", default=0)
+        verbose_name="وضعیت موجود - درصد چربی", default=0, editable=False)
 
     diffrence_weight = models.FloatField(
-        verbose_name="وضعیت موجود - وزن", default=0, editable=False)
+        verbose_name=" اختلاف - وزن", default=0, editable=False)
     diffrence_bfm = models.FloatField(
-        verbose_name="وضعیت موجود - توده چربی", default=0, editable=False)
+        verbose_name=" اختلاف - توده چربی", default=0, editable=False)
     diffrence_smm = models.FloatField(
-        verbose_name="وضعیت موجود - عضله ", default=0, editable=False)
+        verbose_name=" اختلاف - عضله ", default=0, editable=False)
     diffrence_pbf = models.FloatField(
-        verbose_name="وضعیت موجود - درصد چربی", default=0, editable=False)
+        verbose_name=" اختلاف - درصد چربی", default=0, editable=False)
 
     point_state_weight = models.FloatField(
         verbose_name="هدف مقطعی - وزن", default=0)
@@ -280,7 +280,7 @@ class Analysis (models.Model):
     point_state_smm = models.FloatField(
         verbose_name="هدف مقطعی - عضله ", default=0)
     point_state_pbf = models.FloatField(
-        verbose_name="هدف مقطعی - درصد چربی", default=0)
+        verbose_name="هدف مقطعی - درصد چربی", default=0, editable=False)
 
     reportfile = models.FileField(
         verbose_name="فایل آنالیز", null=True, default="''", blank=True)
@@ -364,3 +364,31 @@ class WalletCharge(models.Model):
 
     def __str__(self):
         return f"{self.peyment_person}"
+
+
+class AttendanceSheet(models.Model):
+    id = models.AutoField(primary_key=True, verbose_name='ردیف')
+    aclass = models.ForeignKey(
+        Classi, verbose_name="نام کلاس", blank=True, on_delete=models.CASCADE,null=True)
+    aname = models.CharField(max_length=250, blank=True, verbose_name="عنوان")
+    for i in range(1, 15):
+        locals()[f'doa_{i}'] = jmodels.jDateField(
+            verbose_name=f" تاریخ جلسه {i}", blank=True, null=True)
+    STATE_CHOICES = [
+        ('absent', 'غییت غیر مجاز'),
+        ('present', 'حاضر'),
+        ('validabsent', 'غیبت مجاز'),      
+        ('notset', ' وارد نشده '),
+
+    ]
+    state = models.CharField(max_length=20, choices=STATE_CHOICES,
+                             verbose_name="وضعیت حضور", default="notset", editable=False)
+    
+    class Meta:
+        verbose_name = "لیست حضور و غیاب"
+        verbose_name_plural = " لیستهای حضور و غیاب"
+
+    def __str__(self):
+        return f"{self.aname}"
+
+

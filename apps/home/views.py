@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 from django.urls import reverse
-from .models import Person, Classi, SessionDate, Peyment, AbsenceDate, Analysis,ValidAbsenceDate
+from .models import Person, Classi, SessionDate, Peyment, AbsenceDate, Analysis,ValidAbsenceDate,AttendanceSheet
 from dal import autocomplete
 import jdatetime
 from django.conf.urls.static import static
@@ -361,3 +361,75 @@ def pages(request):
         html_template = loader.get_template('home/page-500.html')
         return HttpResponse(html_template.render(context, request))
 '''
+
+
+@login_required(login_url="/login/")
+def attendsheet(request, ccname):
+    if request.user.is_superuser:
+        monthname = {"فروردین": "01",  "اردیبهشت": "02",  "خرداد": "03",  "تیر": "04",  "مرداد": "05",
+                     "شهریور": "06",  "مهر": "07",  "آبان": "08",  "آذر": "09",  "دی": "10", "بهمن": "11",  "اسفند": "12"}
+
+        studentList = []
+        students = []
+        AttendanceFormSet = formset_factory(AttendanceForm, extra=0)
+        for obj in Person.objects.filter(role='student'):
+            if not obj.is_admin:
+                if obj.classname != None and obj.classname.cname == ccname:
+                    students.append(obj)
+        formset = AttendanceFormSet(request.POST or None, initial=[
+                                    {'name': student.full_name} for student in students])
+        if request.method == 'POST':
+            cname_obj = Classi.objects.get(cname=ccname)
+
+            inDate = request.POST.get("date").split(",")
+            print(inDate)
+            di = int(inDate[0])
+            mi = int(monthname[inDate[1]])
+            yi = int(inDate[2])
+            datePost = jdatetime.date(
+                yi, mi, di).togregorian().strftime("%Y-%m-%d")
+            print("*****", datePost)
+            for student, attendance in request.POST.items():
+                # person_id = request.POST[item].split("_")[-1]
+                if student.isdigit():
+                    person = Person.objects.get(id=student)
+                    if attendance == 'present':
+                        SessionDate.objects.create(
+                            session_person=person, dos=datePost, classname=cname_obj)
+                        studentList.append(person)
+                    elif attendance == 'absent':
+                        AbsenceDate.objects.create(
+                            absent_person=person, doa=datePost, classname=cname_obj)
+                    elif attendance == 'vabsent':
+                        ValidAbsenceDate.objects.create(
+                            vabsent_person=person, dova=datePost, classname=cname_obj)
+
+                        studentList = []
+            trainer = Person.objects.get(
+                id=request.POST.get("trainer_select"))
+            sessionObj = SessionDate.objects.create(
+                session_person=trainer, dos=jdatetime.datetime.now(), classname=cname_obj)
+            for item in studentList:
+                sessionObj.sstudent.add(item)
+            sessionObj.save()
+            return HttpResponseRedirect(f'/classlist/{ccname}')
+    
+    date_fields = tuple(f'doa_{i}' for i in range(1, 13))
+    alist = AttendanceSheet.objects.filter(
+        aname='fitness3-4').values_list(*date_fields)
+    context = {'segment': 'classlist'}
+    person = []
+    context['person'] = person
+    print([f for f in alist])
+    context['alist'] = [f.strftime('%Y-%m-%d') for f in alist[0]]
+    context['cname'] = ccname
+    trainers = []
+    for obj in Person.objects.filter(role='trainer'):
+        trainers.append(obj)
+    context['trainers'] = trainers
+    context['jdate'] = date_maker()
+    context['formset'] = formset
+    context['students'] = students
+
+    html_template = loader.get_template('home/AttendanceSheet.html')
+    return HttpResponse(html_template.render(context, request))

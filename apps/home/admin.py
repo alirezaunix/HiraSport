@@ -2,9 +2,9 @@
 
 from django.contrib.auth.models import User
 from django.contrib import admin
-from .models import Person, SportField, Peyment, SessionDate, Classi, AbsenceDate, Analysis, ValidAbsenceDate,Insurance
+from .models import Person, SportField, Peyment, SessionDate, Classi, AbsenceDate, Analysis, ValidAbsenceDate, Insurance, AttendanceSheet
 from django.db.models.signals import post_save
-from .forms import PeymentForm, SessionForm, ClassiForm, InsuranceForm  # AnalysisForm
+from .forms import PeymentForm, SessionForm, ClassiForm, InsuranceForm , AnalysisForm
 from django.dispatch import receiver
 from django.contrib.auth.models import User
 import jdatetime
@@ -71,10 +71,10 @@ class ClassiAdmin(admin.ModelAdmin):
 @admin.register(Analysis)
 class AnalysisAdmin(admin.ModelAdmin):
     list_display = ['id', 'analysis_person','dot']
-    #form = AnalysisForm
-    #model = Analysis
-    list_filter = ['analysis_person']
-    search_fields = ['analysis_person__full_name']
+    form = AnalysisForm
+    model = Analysis
+    #list_filter = ['analysis_person']
+    #search_fields = ['analysis_person__full_name']
 
 
 @admin.register(AbsenceDate)
@@ -91,6 +91,21 @@ class ValidAbsenceDateAdmin(admin.ModelAdmin):
     list_filter = ['dova']
 
 
+@admin.register(AttendanceSheet)
+class AttendanceSheetAdmin(admin.ModelAdmin):
+    list_display = ['id', 'aname', 'aclass']+[f'doa_{i}' for i in range(1, 13)]
+    search_fields=['aname']
+    list_filter=['aname']
+    #filter_horizontal = ['aperson']
+    
+    def get_person_display(self, obj):
+        return ", ".join(person.full_name for person in obj.person.all())
+    get_person_display.short_description = 'Persons'
+    
+    
+ ################## Actions Part ####################
+    
+    
 @receiver(post_save, sender=AbsenceDate)
 def AbsenceAction(instance,created, **kwargs):
     if created:
@@ -140,8 +155,12 @@ def PersonAction( instance, created, **kwargs):
 
 @receiver(post_save, sender=Analysis)
 def AnalysysAction( instance, created, **kwargs):
+    Analysis.objects.filter(id=instance.pk).update(
+    current_state_pbf = instance.current_state_bfm/instance.current_state_weight,
+    point_state_pbf = instance.point_state_bfm/instance.point_state_weight)
 
     if created:
+
         try:
             personID=(instance.analysis_person.id)
             previous_record = Analysis.objects.filter(
@@ -171,3 +190,31 @@ def AnalysysAction( instance, created, **kwargs):
         person_obj.nextanalysis=f"{yeari}-{monti}-{lastanalysis[2]}"
         person_obj.save()
 
+'''
+
+# your_app/admin.py
+from django.contrib import admin
+from django.db.models import Model
+
+def prevent_duplicate_items(model_admin, request, obj, form, change):
+    """
+    Custom function to prevent duplicate items in the admin.
+    """
+    # Check if an item with the same value exists for today
+    item_exists = obj.__class__.objects.filter(your_field=obj.your_field, date_field__date=obj.date_field).exists()
+
+    if not item_exists:
+        # Save the item to the database
+        obj.save()
+    else:
+        model_admin.message_user(request, "Item already exists for today.", level=admin.WARNING)
+
+class YourModelAdmin(admin.ModelAdmin):
+    def save_model(self, request, obj, form, change):
+        prevent_duplicate_items(self, request, obj, form, change)
+
+# Register your model with the custom admin class
+admin.site.register(YourModel, YourModelAdmin)
+
+
+'''

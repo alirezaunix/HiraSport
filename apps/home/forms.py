@@ -26,6 +26,20 @@ class InsuranceForm(forms.ModelForm):
         }
 
 
+class AnalysisForm(forms.ModelForm):
+    class Meta:
+        model = Analysis
+        fields = ('dot', 'analysis_person', 'current_state_weight',
+                  'current_state_bfm', 'current_state_smm', 'point_state_weight', 'point_state_bfm', 'point_state_smm')
+        search_fields = [ 'analysis_person__full_name']
+
+        widgets = {
+            'analysis_person': autocomplete.ModelSelect2(url='select2_fk'),
+        }
+
+
+
+
         
 class SessionForm(forms.ModelForm):
     class Meta:
