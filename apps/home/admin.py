@@ -155,10 +155,14 @@ def PersonAction( instance, created, **kwargs):
 
 @receiver(post_save, sender=Analysis)
 def AnalysysAction( instance, created, **kwargs):
-    Analysis.objects.filter(id=instance.pk).update(
+    try:
+        Analysis.objects.filter(id=instance.pk).update(
     current_state_pbf = instance.current_state_bfm/instance.current_state_weight,
     point_state_pbf = instance.point_state_bfm/instance.point_state_weight)
-
+    except:
+        Analysis.objects.filter(id=instance.pk).update(
+            current_state_pbf=0,
+            point_state_pbf=0)
     if created:
 
         try:
