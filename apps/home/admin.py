@@ -157,8 +157,8 @@ def PersonAction( instance, created, **kwargs):
 def AnalysysAction( instance, created, **kwargs):
     try:
         Analysis.objects.filter(id=instance.pk).update(
-    current_state_pbf = instance.current_state_bfm/instance.current_state_weight,
-    point_state_pbf = instance.point_state_bfm/instance.point_state_weight)
+    current_state_pbf = (instance.current_state_bfm/instance.current_state_weight)*100,
+    point_state_pbf = (instance.point_state_bfm/instance.point_state_weight)*100)
     except:
         Analysis.objects.filter(id=instance.pk).update(
             current_state_pbf=0,
