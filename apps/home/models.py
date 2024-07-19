@@ -124,7 +124,7 @@ class Person(AbstractBaseUser):
     t_edu = models.TextField(verbose_name="میزان تحصیلات", blank=True)
     t_exp = models.TextField(verbose_name="سوابق تجربی", blank=True)
     t_shortdesc = models.TextField(verbose_name="توضیح کوتاه ", blank=True)
-    changeFlag=models.IntegerField(blank=True,default=0)
+    changeFlag=models.IntegerField(blank=True,default=0,editable=False)
     wallet =models.IntegerField(verbose_name="کیف پول", default=0,blank=True,null=True)
     
     nextanalysis = models.CharField(
@@ -383,7 +383,10 @@ class AttendanceSheet(models.Model):
     ]
     state = models.CharField(max_length=20, choices=STATE_CHOICES,
                              verbose_name="وضعیت حضور", default="notset", editable=False)
-    
+
+    created_at = models.DateTimeField(
+        auto_now_add=True, verbose_name='تاریخ ایجاد',editable=False, blank=True,null=True)
+
     class Meta:
         verbose_name = "لیست حضور و غیاب"
         verbose_name_plural = " لیستهای حضور و غیاب"

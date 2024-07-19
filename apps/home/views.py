@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 from django.urls import reverse
-from .models import Person, Classi, SessionDate, Peyment, AbsenceDate, Analysis,ValidAbsenceDate,AttendanceSheet
+from .models import Person, Classi, SessionDate, Peyment, AbsenceDate, Analysis, ValidAbsenceDate, AttendanceSheet, Insurance
 from dal import autocomplete
 import jdatetime
 from django.conf.urls.static import static
@@ -14,6 +14,8 @@ from django.contrib.auth.models import User
 from .forms import AttendanceForm
 from django.forms import formset_factory
 import datetime
+from django_jalali.db import models as jmodels
+
 
 
 def date_maker():
@@ -65,9 +67,20 @@ def index(request):
 @login_required(login_url="/login/")
 def todayclasslist(request):
     if request.user.is_superuser:
+        if request.method == 'POST':
+            formdict = dict(request.POST)
+            formdict.pop('csrfmiddlewaretoken')
+            print(formdict)
+            for item in formdict['sheetselect']:
+                if len(item)>0:
+                    destination_url = reverse('attendsheet', args=[
+                                              item.split("-")[0],item.split("-")[1]])
+                    return HttpResponseRedirect(destination_url)
         context = {'segment': 'index'}
         context['jdate'] = date_maker()
-        context['row_data']=Classi.objects.all()
+        context['classi'] = Classi.objects.all()
+        attendance_sheets = AttendanceSheet.objects.all().order_by('-created_at')
+        context['attendance_sheets']=attendance_sheets
         '''
     weekday = [ "Mon", "Tue", "Wed", "Thu", "Fri", "Sat","Sun",]
     wday = weekday[jdatetime.datetime.today().weekday()-1]
@@ -364,11 +377,13 @@ def pages(request):
 
 
 @login_required(login_url="/login/")
-def attendsheet(request, ccname):
+def attendsheet(request, ccname,sheetid):
     if request.user.is_superuser:
         monthname = {"فروردین": "01",  "اردیبهشت": "02",  "خرداد": "03",  "تیر": "04",  "مرداد": "05",
                      "شهریور": "06",  "مهر": "07",  "آبان": "08",  "آذر": "09",  "دی": "10", "بهمن": "11",  "اسفند": "12"}
 
+        #sheetid = ccname.split("-")[1]
+        ccname=ccname.split("-")[0]
         studentList = []
         students = []
         AttendanceFormSet = formset_factory(AttendanceForm, extra=0)
@@ -378,51 +393,92 @@ def attendsheet(request, ccname):
                     students.append(obj)
         formset = AttendanceFormSet(request.POST or None, initial=[
                                     {'name': student.full_name} for student in students])
+        cname_obj = Classi.objects.get(cname=ccname)
+
         if request.method == 'POST':
             cname_obj = Classi.objects.get(cname=ccname)
+            formdict=dict(request.POST)
+            formdict.pop('csrfmiddlewaretoken')
+            formdict.pop('register')
+            trainer_id = formdict.pop('trainer_select')
+            for k,v in formdict.items():            
+                if '1' not in v[0]:
+                    userID=k.split('_')[1]
+                    person=Person.objects.get(id=userID)
+                    dateFa=k.split('_')[2]
+                    dateEn = jdatetime.date.fromisoformat(
+                            dateFa).togregorian()
+                    if v[0] =='2':
+                        if not SessionDate.objects.filter(session_person=person, dos=dateEn, classname=cname_obj):
+                            SessionDate.objects.create(session_person=person, dos=dateEn, classname=cname_obj)
+                            
+                        if AbsenceDate.objects.filter(absent_person=person, doa=dateEn, classname=cname_obj):
+                            AbsenceDate.objects.filter(
+                                absent_person=person, doa=dateEn, classname=cname_obj).delete()
+                            
+                        if  ValidAbsenceDate.objects.filter(vabsent_person=person, dova=dateEn, classname=cname_obj):
+                            ValidAbsenceDate.objects.filter(
+                                vabsent_person=person, dova=dateEn, classname=cname_obj).delete()
+                            
+                    elif v[0]=='4':
+                        if not AbsenceDate.objects.filter(absent_person=person, doa=dateEn, classname=cname_obj):
+                            AbsenceDate.objects.create(absent_person=person, doa=dateEn, classname=cname_obj)
+                            
+                        if  SessionDate.objects.filter(session_person=person, dos=dateEn, classname=cname_obj):
+                            SessionDate.objects.filter(
+                                session_person=person, dos=dateEn, classname=cname_obj).delete()
 
-            inDate = request.POST.get("date").split(",")
-            print(inDate)
-            di = int(inDate[0])
-            mi = int(monthname[inDate[1]])
-            yi = int(inDate[2])
-            datePost = jdatetime.date(
-                yi, mi, di).togregorian().strftime("%Y-%m-%d")
-            print("*****", datePost)
-            for student, attendance in request.POST.items():
-                # person_id = request.POST[item].split("_")[-1]
-                if student.isdigit():
-                    person = Person.objects.get(id=student)
-                    if attendance == 'present':
-                        SessionDate.objects.create(
-                            session_person=person, dos=datePost, classname=cname_obj)
-                        studentList.append(person)
-                    elif attendance == 'absent':
-                        AbsenceDate.objects.create(
-                            absent_person=person, doa=datePost, classname=cname_obj)
-                    elif attendance == 'vabsent':
-                        ValidAbsenceDate.objects.create(
-                            vabsent_person=person, dova=datePost, classname=cname_obj)
+                        if  ValidAbsenceDate.objects.filter(vabsent_person=person, dova=dateEn, classname=cname_obj):
+                            ValidAbsenceDate.objects.filter(
+                                vabsent_person=person, dova=dateEn, classname=cname_obj).delete()
+                        
+                    elif v[0] == '3':
+                        if not ValidAbsenceDate.objects.filter(vabsent_person=person, dova=dateEn, classname=cname_obj):
+                            ValidAbsenceDate.objects.create(vabsent_person=person, dova=dateEn, classname=cname_obj)
+                        
+                        if  AbsenceDate.objects.filter(absent_person=person, doa=dateEn, classname=cname_obj):
+                            AbsenceDate.objects.filter(
+                                absent_person=person, doa=dateEn, classname=cname_obj).delete()
 
-                        studentList = []
-            trainer = Person.objects.get(
-                id=request.POST.get("trainer_select"))
-            sessionObj = SessionDate.objects.create(
-                session_person=trainer, dos=jdatetime.datetime.now(), classname=cname_obj)
-            for item in studentList:
-                sessionObj.sstudent.add(item)
-            sessionObj.save()
-            return HttpResponseRedirect(f'/classlist/{ccname}')
+                        if SessionDate.objects.filter(session_person=person, dos=dateEn, classname=cname_obj):
+                            SessionDate.objects.filter(
+                                session_person=person, dos=dateEn, classname=cname_obj).delete()
+
+                        
+                        #TODO must select wich date to add to trainer session
+                        #TODO maybe absent or other in passed will change
+
+            return HttpResponseRedirect(f'/attendsheet/{ccname}/{sheetid}')
     
-    date_fields = tuple(f'doa_{i}' for i in range(1, 13))
+    date_fields = tuple(f'doa_{i}' for i in range(1, 15))
     alist = AttendanceSheet.objects.filter(
-        aname='fitness3-4').values_list(*date_fields)
+        id=sheetid).values_list(*date_fields)
     context = {'segment': 'classlist'}
     person = []
     context['person'] = person
-    print([f for f in alist])
+    #print([f for f in alist])
     context['alist'] = [f.strftime('%Y-%m-%d') for f in alist[0]]
-    context['cname'] = ccname
+    dos={}
+    doa={}
+    dova={}
+    for i in (context['alist']):
+        dos[i]= [ str(i.session_person.id) for i in SessionDate.objects.filter(dos=i)]
+        doa[i] = [str(i.absent_person.id)
+                  for i in AbsenceDate.objects.filter(doa=i)]
+        dova[i] = [str(i.vabsent_person.id)
+                   for i in ValidAbsenceDate.objects.filter(dova=i)]
+    context['dos'] = dos
+    context['doa'] = doa
+    context['dova'] = dova
+    
+#        print(f'doa_{j}', context[f'doa_{j}'])
+# bayad did ke aya dar ke ha omadan kelas, dar templete bebinim ke aya dar radif krbar dar in list in nafare hast?
+    context['sheetlist'] = AttendanceSheet.objects.get(
+        id=sheetid)
+    context['cname'] = cname_obj
+    print("+++++++",students)
+    
+    #context['insurance'] = Insurance.objects.all()
     trainers = []
     for obj in Person.objects.filter(role='trainer'):
         trainers.append(obj)

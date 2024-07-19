@@ -1,6 +1,8 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} Tables Data {% endblock %} 
+{% load dict_filter %}
+
+{% block title %} لیست حضور و غیاب  {% endblock %} 
 
 <!-- Element injected in the BODY element -->
 {% block body_class %} {% endblock body_class %} 
@@ -26,6 +28,33 @@
   <link rel="stylesheet" href="{{ ASSETS_ROOT }}/dist/css/persian-datepicker-0.4.5.min.css" />
 
   <style>
+
+
+    table.dataTable, 
+    table.dataTable th, 
+    table.dataTable td {
+        border: 2px solid #63b9e0; /* Adjust the border color as needed */
+        text-align: center; /* Center the text horizontally */
+        vertical-align: middle; /* Center the text vertically */
+
+    }
+
+    button {
+    display: block; /* Ensures buttons take up full width of cell */
+    margin: 0 auto; /* Centers the button horizontally within the cell */
+  }
+
+   table.dataTable td button {
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box; /* Ensure padding is included in the button's dimensions */
+    }
+
+        table.dataTable td select {
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box; /* Ensure padding is included in the select's dimensions */
+        }
     .example-modal .modal {
       position: relative;
       top: auto;
@@ -39,6 +68,22 @@
     .example-modal .modal {
       background: transparent !important;
     }
+
+
+.btn-present {
+    background-color: #42f59b;
+    color: black;
+}
+
+.btn-valid-absent {
+    background-color: #f5dd42;
+    color: black;
+}
+
+.btn-absent {
+    background-color: #f5425a;
+    color: white;
+}
   </style>
 
 {% endblock stylesheets %}
@@ -56,46 +101,95 @@
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
     <section class="content-header">
-      <h1>
-          کلاس {{cname}}
+      <h1 dir="rtl">
+           {{sheetlist.aclass}}  {{cname.starttime}}
       </h1>
+      <h2 dir="rtl">
+         {{sheetlist.aname}}
+      </h2>
       <ol class="breadcrumb">
-        <li><a href="#"><i class="fa fa-dashboard"></i> خانه</a></li>
-        <li><a href="#">جدول</a></li>
-        <li class="active">پیشرفته</li>
+        <li><a href="/"><i class="fa fa-dashboard"></i> خانه</a></li>
+        <li><a href="#"> لیست حضور و غیاب</a></li>
       </ol>
     </section>
 
     <section class="content">
       <div class="row">
         <div class="col-xs-12">
-      <form action="/submit-attendance" method="post">
-    <table class="table table-bordered">
+      <form id="myForm" method="POST">
+      {% csrf_token %}
+
+    <table class="cell-border" id="example2" style="width:100%">
       <thead>
-        <tr>
-          <th>الاسم</th>
-          <!-- Dates as headers -->
-          {% for al in alist %}
-          <th> {{ al }} </th>
-          {% endfor %}
-          <!-- Add more dates as needed -->
-        </tr>
       </thead>
       <tbody>
-        <!-- Student rows -->
         <tr>
-          <td>John Doe</td>
-          <td><input type="checkbox" name="attendance[John Doe][2024-06-20]" class="tri-state"></td>
-          <td><input type="checkbox" name="attendance[John Doe][2024-06-21]" class="tri-state"></td>
-          <td><input type="checkbox" name="attendance[John Doe][2024-06-22]" class="tri-state"></td>
-          <!-- Repeat for other dates -->
+          <td>نام</td>
+          <td>تاریخ بعدی بیمه</td>
+          <td>تاریخ آنالیز بعدی </td>
+          {% for al in alist %}
+          <td > {{ al }} </td>
+          {% endfor %}
         </tr>
-        <!-- Repeat for other students -->
+
+        {% for student in students %}   
+          <tr>
+            <td>{{student}}</td>
+            <td>{{student.insurancedate}}</td>
+            <td>{{student.nextanalysis}}</td>
+              {% for date in alist %}
+                  {% if student.id|stringformat:"s" in dos|dict_filter:date %}
+                    <td>
+                                <button type="button" class="stateButton btn btn-present" data-name="{{student.id}}" data-date="{{date}}" data-state="2"><i class="fa fa-check" aria-hidden="true"></i></button>
+                                <input type="hidden" name="state_{{student.id}}_{{date}}" value="2">
+                    </td>
+                  {% elif student.id|stringformat:"s" in doa|dict_filter:date %}
+                  <td>
+                                <button type="button" class="stateButton btn btn-absent" data-name="{{student.id}}" data-date="{{date}}" data-state="4"><i class="fa fa-times" aria-hidden="true"></i></button>
+                                <input type="hidden" name="state_{{student.id}}_{{date}}" value="4">
+                  </td>
+                  {% elif student.id|stringformat:"s" in dova|dict_filter:date %}
+                  <td>
+                                <button type="button" class="stateButton btn btn-valid-absent" data-name="{{student.id}}" data-date="{{date}}" data-state="3"><i class="fa fa-circle-o-notch" aria-hidden="true"></i></button>
+                                <input type="hidden" name="state_{{student.id}}_{{date}}" value="3">
+                    </td>
+
+                    {% else %}
+                    
+                    <td>
+                      <button type="button" class="stateButton btn btn-light" data-name="{{student.id}}" data-date="{{date}}" data-state="1">-</button>
+                      <input type="hidden" name="state_{{student.id}}_{{date}}" value="1">
+                    </td>
+                    
+                  {% endif%}
+              {% endfor %}
+          </tr> 
+        {% endfor %}
+          <tr>
+            <td>مربی</td>
+            <td>
+                      <button type="button" class="btn btn-light" data-name="{{student.id}}" data-date="{{date}}" data-state="1">------------</button>
+                      <input type="hidden" name="state_{{student.id}}_{{date}}" value="1">
+                    </td>
+            <td>
+                      <button type="button" class="btn btn-light" data-name="{{student.id}}" data-date="{{date}}" data-state="1">------------</button>
+                      <input type="hidden" name="state_{{student.id}}_{{date}}" value="1">
+                    </td>
+            {% for date in alist %} 
+            <td>
+              <select form="myForm" name="trainer_select" class="form-control select2" style="width: 100%;">
+                
+                <option  value="{{trainer.id}}_{{date}}">{{cname.ctrainer}}</option>
+                {% for trainer in trainers %}
+                  <option  value="{{trainer.id}}_{{date}}">{{trainer.full_name}}</option>
+                  {% endfor%}
+                </select>
+            </td>   
+          {%endfor%}
+          </tr>
       </tbody>
     </table>
-    <div class="text-right">
-      <button type="submit" class="btn btn-primary">Submit</button>
-    </div>
+           
   </form>
  
         </div>
@@ -106,22 +200,13 @@
         <div class="col-xs-12">
           <div class="box">
             <div class="box-header">
-              <h3 class="box-title">مربی  کلاس</h3>
               <div class="box-tools">
                 <div class="input-group input-group-sm" style="width: 150px;">                  
                 </div>
               </div>
             </div>
             <!-- /.box-header -->
-            <div class="box-body " style="width: 75%;">
-              <div class="form-group">
-                <select form="myForm" name="trainer_select" class="form-control select2" style="width: 30%;">
-                  {% for trainer in trainers %}
-                  <option  value="{{trainer.id}}">{{trainer.full_name}}</option>
-                  {% endfor%}
-                </select>
-              </div>
-            </div>
+
             <!-- /.box-body -->
           </div>
           <!-- /.box -->
@@ -135,13 +220,31 @@
                 <p>
 حضور و غیاب همه نفرات را مشخص کنید و سپس مربی را انتخاب و در نهایت دکمه ثبت را بزنید<br>به هیچ عنوان صفحه را رفرش نکنید یا از back استفاده نکنید
         </p> 
+
+         <p>
+        <button type="button" class="stateButton btn btn-present" data-name="" data-date="" data-state=""><i class="fa fa-check" aria-hidden="true"></i></button>
+        حضور
+      </p>
+      <p>
+        <button type="button" class="stateButton btn btn-valid-absent" data-name="" data-date="" data-state=""><i class="fa fa-circle-o-notch" aria-hidden="true"></i></button>
+        غیبت مجاز
+      </p>
+
+        <p>
+        <button type="button" class="stateButton btn btn-absent" data-name="" data-date="" data-state=""><i class="fa fa-times" aria-hidden="true"></i></button>
+        غیبت 
+      </p>
+      <p>
+        <button type="button" class="stateButton btn btn-light" data-name="" data-date="" data-state="" style="color:black">-</button>
+        مورد ثبت نشده 
+      </p>
 </div>
 
       <div class="row">
         <div class="col-xs-12">
           <div class="box box-default">
             <div class="box-body">
-                <button onclick="myFunction()" form="myForm" type="submit" name="register"   class="btn btn-success" data-toggle="modal" data-target="#modal-success" >ثبت حضور و غیاب</button>
+                <button id="submitting" onclick="myFunction()" form="myForm" type="submit" name="register"   class="btn btn-success" data-toggle="modal" data-target="#modal-success" >ثبت حضور و غیاب</button>
 
               </div>
           </div>
@@ -160,6 +263,7 @@
   <!-- jQuery -->
   <script src="{{ ASSETS_ROOT }}/bower_components/jquery/dist/jquery.min.js"></script>
   <script src="{{ ASSETS_ROOT }}/plugins/jquery/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
 
   <!-- Bootstrap 4 -->
   <script src="{{ ASSETS_ROOT }}/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -191,13 +295,14 @@
         "autoWidth": false,
       });
       $('#example2').DataTable({
-        "paging": true,
-        "lengthChange": false,
+        "paging": false,
+        "lengthChange": true,
         "searching": false,
-        "ordering": true,
-        "info": true,
-        "autoWidth": false,
+        "ordering": false,
+        "info": false,
+        "autoWidth": true,
         "responsive": true,
+        'scrollX': true,
       });
     });
   </script>
@@ -440,34 +545,46 @@
 
   </script>
 
-  <script>
-function myFunction() {
-  alert("اعمال گردید");
-}
-</script>
-
 
 <script>
-// Tri-state checkbox functionality
-$('.tri-state').each(function() {
-  var state = 0; // 0: unchecked, 1: checked, 2: indeterminate
-  $(this).on('click', function() {
-    state = (state + 1) % 3;
-    switch(state) {
-      case 0:
-        $(this).prop('indeterminate', false);
-        $(this).prop('checked', false);
-        break;
-      case 1:
-        $(this).prop('indeterminate', false);
-        $(this).prop('checked', true);
-        break;
-      case 2:
-        $(this).prop('indeterminate', true);
-        break;
-    }
-  });
+// script.js
+
+document.addEventListener('DOMContentLoaded', (event) => {
+    const stateButtons = document.querySelectorAll('.stateButton');
+    const states = [
+        { class: 'btn-light', text: '-', value: 1 },
+        { class: 'btn-present', text: '-', value: 2 },
+        { class: 'btn-valid-absent', text: '-', value: 3 },
+        { class: 'btn-absent', text: '-', value: 4 }
+    ];
+
+    stateButtons.forEach(button => {
+        let currentState = 0;
+
+        button.addEventListener('click', () => {
+            currentState = (currentState + 1) % states.length;
+            button.className = `stateButton btn ${states[currentState].class}`;
+            button.textContent = states[currentState].text;
+            button.dataset.state = states[currentState].value;
+
+            // Update the corresponding hidden input value
+            const hiddenInput = button.nextElementSibling;
+            hiddenInput.value = states[currentState].value;
+        });
+    });
 });
+
+function myFunction() {
+  alert("اعمال گردید");
+    
+    const stateForm = document.getElementById('stateForm');
+
+    // Submit the form
+    stateForm.submit();
+}
+
 </script>
+
+
 
 {% endblock javascripts %}

@@ -9,5 +9,3 @@ def format_money(value):
     value = int(value)
     # Format the integer with underscores
     return '/'.join(f"{value:,}".split(','))
-
-# Remember to replace commas with underscores

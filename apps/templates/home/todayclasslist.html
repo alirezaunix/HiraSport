@@ -51,7 +51,7 @@
       <ol class="breadcrumb">
         <li><a href="#"><i class="fa fa-dashboard"></i> خانه</a></li>
         <li><a href="#">جدول</a></li>
-        <li class="active">پیشرفته</li>
+        <li class="active">لیست حضور و غیاب</li>
       </ol>
     </section>
 
@@ -76,6 +76,9 @@
             </div>
             <!-- /.box-header -->
             <div class="box-body table-responsive no-padding">
+              <form method="POST">
+                      {% csrf_token %}
+
               <table id="example1" class="table table-bordered table-striped ">
                 <thead>  
                 <tr>
@@ -84,12 +87,13 @@
                                 <th style="text-align: right;">جنسیت </th>
                                 <th style="text-align: right;">ساعت شروع</th>
                                 <th style="text-align: right;">مربی </th>
-                                <th style="text-align: right;">نفرات</th>
+                                <th style="text-align: right;">لیستها</th>
+                                <th style="text-align: right;">ارجاع</th>
 
                 </tr>
               </thead>
               </tbody>
-                            {% for row in row_data %}
+                            {% for row in classi %}
                             <tr>
                                 <td align="right">{{row.cname}}</td>
                                 <td align="right">{{row.weekdays}}</td>
@@ -100,11 +104,24 @@
                                               {% endif %}
                                 <td align="right">{{row.starttime}}</td>
                                 <td align="right">{{row.ctrainer}}</td>
-                                <td align="right"><a href="/classlist/{{row.cname}}"><button type="submit"  class="btn  btn-xs  bg-maroon btn-flat ">لیست نفرات </button></a></td>
+                                
+                                <td align="right">
+                                <select id="itemSelect"  name="sheetselect">
+                                  <option value="">یک شیت انتخاب کنید</option>  
+                                  {% for attendance in attendance_sheets %}
+                                      {% if attendance.aclass.id == row.id  %}  
+                                      <option value="{{row.cname}}-{{attendance.id}}">{{ attendance.aname }}</option>
+                                      {% endif %}
+                                    {% endfor %}
+                                </select>
+                                </td>
+
+                                <td align="right"><button type="submit"  class="btn  btn-xs  bg-maroon btn-flat ">لیست نفرات </button></a></td>
                             </tr>
                             {% endfor %}
                           </tbody>
               </table>
+            </form>
             </div>
             <!-- /.box-body -->
           </div>
@@ -146,7 +163,7 @@
   <script src="{{ ASSETS_ROOT }}/js/demo.js"></script>
   <!-- page script -->
   <script>
-    $(function () {
+      $(function () {
       $("#example1").DataTable({
         "paging": false,
         "responsive": true,
@@ -166,6 +183,9 @@
         "responsive": true,
       });
     });
+
+
+
   </script>
 
 {% endblock javascripts %}

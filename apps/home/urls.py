@@ -31,7 +31,7 @@ urlpatterns = [
     path('classlist/<str:ccname>', views.classlist, name='classlist'),
     path('todayclasslist/', views.todayclasslist, name='todayclasslist'),
     path('trainerslist/', views.trainerslist, name='trainerslist'),
-    path('attendsheet/<str:ccname>', views.attendsheet, name='attendsheet'),
+    path('attendsheet/<str:ccname>/<str:sheetid>', views.attendsheet, name='attendsheet'),
 
     url(
         r'^autocomplete/$',
