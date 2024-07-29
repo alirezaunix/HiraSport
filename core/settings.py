@@ -31,6 +31,7 @@ CSRF_TRUSTED_ORIGINS = ['http://localhost:85', 'http://127.0.0.1',
 
 # Application definition
 
+
 INSTALLED_APPS = [
     'dal',
     'dal_select2',
@@ -44,7 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_jalali',
     'multiselectfield',
-    'apps.home'  # Enable the inner home (home)
+    'apps.home',  
 ]
 
 MIDDLEWARE = [

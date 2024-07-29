@@ -119,7 +119,7 @@
       <form id="myForm" method="POST">
       {% csrf_token %}
 
-    <table class="cell-border" id="example2" style="width:100%">
+    <table style="width:100%" class="cell-border" id="example2" >
       <thead>
       </thead>
       <tbody>
@@ -295,6 +295,7 @@
         "autoWidth": false,
       });
       $('#example2').DataTable({
+        'scrollX': true,
         "paging": false,
         "lengthChange": true,
         "searching": false,
@@ -302,7 +303,6 @@
         "info": false,
         "autoWidth": true,
         "responsive": true,
-        'scrollX': true,
       });
     });
   </script>

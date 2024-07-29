@@ -457,7 +457,14 @@ def attendsheet(request, ccname,sheetid):
     person = []
     context['person'] = person
     #print([f for f in alist])
-    context['alist'] = [f.strftime('%Y-%m-%d') for f in alist[0]]
+    alist_temp=[]
+    #context['alist'] = [f.strftime('%Y-%m-%d') for f in alist[0]]
+    for f in alist[0]:
+        try:
+            alist_temp.append(f.strftime('%Y-%m-%d'))
+        except:
+            pass
+    context['alist'] = alist_temp
     dos={}
     doa={}
     dova={}

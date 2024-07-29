@@ -12,6 +12,9 @@
     
   "django": {
     "settingsFile": "core/settings.py"
-  }
+  },
 
+  "cron": [
+    "0 13 * * * 0 cd $ROOT && python3 manage.py smsfromdb >> /dev/null 2>&1"
+  ]
 }
