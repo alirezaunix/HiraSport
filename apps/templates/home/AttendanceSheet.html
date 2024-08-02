@@ -33,10 +33,9 @@
     table.dataTable, 
     table.dataTable th, 
     table.dataTable td {
-        border: 2px solid #63b9e0; /* Adjust the border color as needed */
+        border: 1px solid #63b9e0; /* Adjust the border color as needed */
         text-align: center; /* Center the text horizontally */
         vertical-align: middle; /* Center the text vertically */
-
     }
 
     button {
@@ -65,7 +64,17 @@
       z-index: 1;
     }
 
-    .example-modal .modal {
+ .shiny-zero {
+            background-color: #f8d7da; /* Light red for example */
+            background-image: repeating-linear-gradient(
+                45deg,
+                rgba(255, 0, 0, 0.1),
+                rgba(255, 0, 0, 0.1) 10px,
+                transparent 10px,
+                transparent 20px
+            );
+        }
+  .example-modal .modal {
       background: transparent !important;
     }
 
@@ -115,7 +124,7 @@
 
     <section class="content">
       <div class="row">
-        <div class="col-xs-12">
+        <div class="col-xs-2">
       <form id="myForm" method="POST">
       {% csrf_token %}
 
@@ -128,7 +137,7 @@
           <td>تاریخ بعدی بیمه</td>
           <td>تاریخ آنالیز بعدی </td>
           {% for al in alist %}
-          <td > {{ al }} </td>
+          <td > {{ al  }} </td>
           {% endfor %}
         </tr>
 
@@ -137,31 +146,33 @@
             <td>{{student}}</td>
             <td>{{student.insurancedate}}</td>
             <td>{{student.nextanalysis}}</td>
-              {% for date in alist %}
+            {% for date in alist %}
                   {% if student.id|stringformat:"s" in dos|dict_filter:date %}
-                    <td>
-                                <button type="button" class="stateButton btn btn-present" data-name="{{student.id}}" data-date="{{date}}" data-state="2"><i class="fa fa-check" aria-hidden="true"></i></button>
+                  <td>
+                                <button type="button" class="stateButton btn btn-present {% if rsessionDict|dict_filter:student|dict_filter:forloop.counter0 == 0 %} shiny-zero {% endif %}" data-name="{{student.id}}" data-date="{{date}}" data-state="2"><i class="fa fa-check" aria-hidden="true"></i></button>
                                 <input type="hidden" name="state_{{student.id}}_{{date}}" value="2">
                     </td>
                   {% elif student.id|stringformat:"s" in doa|dict_filter:date %}
                   <td>
-                                <button type="button" class="stateButton btn btn-absent" data-name="{{student.id}}" data-date="{{date}}" data-state="4"><i class="fa fa-times" aria-hidden="true"></i></button>
+                                <button type="button" class="stateButton btn btn-absent {% if rsessionDict|dict_filter:student|dict_filter:forloop.counter0 == 0 %} shiny-zero {% endif %}" data-name="{{student.id}}" data-date="{{date}}" data-state="4"><i class="fa fa-times" aria-hidden="true"></i></button>
                                 <input type="hidden" name="state_{{student.id}}_{{date}}" value="4">
+
                   </td>
                   {% elif student.id|stringformat:"s" in dova|dict_filter:date %}
                   <td>
-                                <button type="button" class="stateButton btn btn-valid-absent" data-name="{{student.id}}" data-date="{{date}}" data-state="3"><i class="fa fa-circle-o-notch" aria-hidden="true"></i></button>
+
+                                <button type="button" class="stateButton btn btn-valid-absent {% if rsessionDict|dict_filter:student|dict_filter:forloop.counter0 == 0 %} shiny-zero {% endif %}"  data-name="{{student.id}}" data-date="{{date}}" data-state="3"><i class="fa fa-circle-o-notch" aria-hidden="true"></i></button>
                                 <input type="hidden" name="state_{{student.id}}_{{date}}" value="3">
+
                     </td>
 
                     {% else %}
-                    
-                    <td>
-                      <button type="button" class="stateButton btn btn-light" data-name="{{student.id}}" data-date="{{date}}" data-state="1">-</button>
-                      <input type="hidden" name="state_{{student.id}}_{{date}}" value="1">
-                    </td>
-                    
-                  {% endif%}
+                        <td>
+                          <button type="button" class="stateButton btn btn-light {% if rsessionDict|dict_filter:student|dict_filter:forloop.counter0 == 0 %} shiny-zero {% endif %}" data-name="{{student.id}}" data-date="{{date}}" data-state="1">-</button>
+                          <input type="hidden" name="state_{{student.id}}_{{date}}" value="1">
+                        </td>
+                  
+                    {% endif%}
               {% endfor %}
           </tr> 
         {% endfor %}
@@ -189,7 +200,6 @@
           </tr>
       </tbody>
     </table>
-           
   </form>
  
         </div>

@@ -95,8 +95,7 @@ class Person(AbstractBaseUser):
     gender = models.CharField(
         max_length=1, verbose_name="جنسیت", choices=gender_choice)
     # dor = jmodels.jDateField(verbose_name="تاریخ ثبت نام اولیه",null=True)
-    sfield = models.ForeignKey(SportField, on_delete=models.CASCADE,
-                               null=True, blank=True, default=None, verbose_name="رشته ورزشی")
+    sfield = models.ForeignKey(SportField, on_delete=models.CASCADE,null=True, blank=True, default=None, verbose_name="رشته ورزشی")
     classname = models.ForeignKey(
         Classi, on_delete=models.CASCADE, null=True, blank=True, default=None, verbose_name="کلاس")
     discount = models.IntegerField(default=0,blank=True,validators=[MinValueValidator(0),MaxValueValidator(100)],verbose_name="درصد تخفیف نفر بر روی دوره ها")

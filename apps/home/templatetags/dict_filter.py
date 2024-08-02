@@ -8,5 +8,5 @@ register = template.Library()
 def dict_filter(dictionary, key):
     try:
         return dictionary[key]
-    except KeyError:
+    except :
         return None  # or you can return a default value

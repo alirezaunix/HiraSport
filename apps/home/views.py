@@ -30,9 +30,6 @@ def date_maker():
 
 class PersonAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
-        # Don't forget to filter out results depending on the visitor !
-        # if not self.request.user.is_authenticated:
-        #    return Person.objects.none()
         qs = Person.objects.all()
         if self.q:
             qs = qs.filter(full_name__istartswith=self.q)
@@ -56,8 +53,6 @@ def index(request):
         return HttpResponse(html_template.render(context, request))
     elif request.user.role=="student":
        person = Person.objects.get(username=request.user.username)
-       # personalreport(request, person.id)
-       #print(">>>>", person.id)
        return HttpResponseRedirect(f'personalreport/{person.id}')
     elif request.user.role=="trainer":
        person = Person.objects.get(username=request.user.username)
@@ -235,8 +230,6 @@ def personalreport(request, person_id):
 
         vabsence = ValidAbsenceDate.objects.filter(vabsent_person=person_id)
         context['vabsence'] = vabsence
-
-
 
         peyment = Peyment.objects.filter(peyment_person=person_id)
         context['peyment'] = peyment
@@ -456,15 +449,27 @@ def attendsheet(request, ccname,sheetid):
     context = {'segment': 'classlist'}
     person = []
     context['person'] = person
-    #print([f for f in alist])
     alist_temp=[]
-    #context['alist'] = [f.strftime('%Y-%m-%d') for f in alist[0]]
     for f in alist[0]:
         try:
             alist_temp.append(f.strftime('%Y-%m-%d'))
         except:
             pass
     context['alist'] = alist_temp
+    
+    rsessionDict={k:[] for k in students}
+    for student in students:
+        jnow=jdatetime.datetime.now()
+        jnow = jdatetime.date(jnow.year, jnow.month, jnow.day)
+        rsessionCounter=student.rsession
+        rsessionList = [-1]*len(alist_temp)
+        for i,datei in enumerate(alist[0]):
+            if jnow< datei:
+                rsessionList[i] = rsessionCounter
+                rsessionCounter-=1
+        rsessionDict[student] = rsessionList
+    context["rsessionDict"] = rsessionDict
+
     dos={}
     doa={}
     dova={}
@@ -478,8 +483,6 @@ def attendsheet(request, ccname,sheetid):
     context['doa'] = doa
     context['dova'] = dova
     
-#        print(f'doa_{j}', context[f'doa_{j}'])
-# bayad did ke aya dar ke ha omadan kelas, dar templete bebinim ke aya dar radif krbar dar in list in nafare hast?
     context['sheetlist'] = AttendanceSheet.objects.get(
         id=sheetid)
     context['cname'] = cname_obj
