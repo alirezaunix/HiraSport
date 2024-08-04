@@ -464,9 +464,12 @@ def attendsheet(request, ccname,sheetid):
         rsessionCounter=student.rsession
         rsessionList = [-1]*len(alist_temp)
         for i,datei in enumerate(alist[0]):
-            if jnow< datei:
-                rsessionList[i] = rsessionCounter
-                rsessionCounter-=1
+            try:
+                if jnow< datei:
+                    rsessionList[i] = rsessionCounter
+                    rsessionCounter-=1
+            except:
+                pass
         rsessionDict[student] = rsessionList
     context["rsessionDict"] = rsessionDict
 
