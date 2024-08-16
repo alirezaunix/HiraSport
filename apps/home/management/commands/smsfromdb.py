@@ -1,7 +1,9 @@
-from apps.home.models import Person,Classi
+from apps.home.models import Person,Classi,SendSMS
 from django.core.management.base import BaseCommand
 from datetime import datetime
 from .melipayamak import Api
+from django.db.models import Q
+import jdatetime
 
 
 
@@ -12,9 +14,9 @@ class Command(BaseCommand):
         weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun",]
         nextdayweekday=weekdays[datetime.today().weekday()+1]
         nextdayclass = Classi.objects.filter(weekdays__contains=nextdayweekday)
-        queryset = Person.objects.filter(
-            rsession=1, classname__in=nextdayclass, is_active=True)
-        #queryset=Person.objects.filter(id=188)
+        #queryset = Person.objects.filter(
+        #    rsession=1, classname__in=nextdayclass, is_active=True).exclude(Q(phone1__isnull=True) | Q(phone1=''))
+        queryset=Person.objects.filter(id=188)
         self.my_custom_function(queryset)
         
     def senderSelection(self,phonenum):
@@ -42,4 +44,7 @@ class Command(BaseCommand):
             to = item.phone1
             _from = self.senderSelection(item.phone1)
             response = sms.send(to, _from, text)
+            jnow = jdatetime.datetime.now().strftime('%Y-%m-%d')
+            SendSMS.objects.create(send_person=item, send_dop=jnow)
+            
             print(response)

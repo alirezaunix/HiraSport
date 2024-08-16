@@ -100,6 +100,14 @@
               {% endif %}
 
               <hr>
+              <strong><i class="fa fa-pencil margin-r-5"></i>ترم جاری:</strong>
+              <p>
+                  {{ attendance.0}} تا {{ attendance|last}}
+              </p>
+
+
+
+              <hr>
               <strong><i class="fa fa-pencil margin-r-5"></i>تعداد جلسات باقی مانده</strong>
               <p>
                   {{ person.rsession }}
@@ -348,56 +356,53 @@
   
   <script src="{{ ASSETS_ROOT }}/dist/js/adminlte.min.js"></script>
 <script>
-  window.onload = function () {
-    var chart = new CanvasJS.Chart("chartContainer", {
-      title: {
-        text: "نمودار ماهانه"             
-      },
-      animationEnabled: true,
-      axisY: {
-        title: ""
-      },
-      toolTip: {
-        shared: true
-      },
-      legend: {
-        cursor: "pointer",
-        itemclick: function(e) {
-          if (typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
-            e.dataSeries.visible = false;
+    window.onload = function () {
+        var chart = new CanvasJS.Chart("chartContainer", {
+          animationEnabled: true,
+          exportEnabled: true,
+          title:{
+            text: "نمودار تغییرات"  
+          },  
+          legend: {
+            cursor: "pointer",
+            verticalAlign: "top",
+            itemclick: hideUnhideDataSeries
+          },
+          data: [{
+				    type: "column",
+            yValueFormatString: "0.#کیلو",
+            name: "وزن",
+            showInLegend: true,
+            dataPoints: {{ weight|safe }}
+          },{
+				    type: "column",
+            yValueFormatString: "0.#کیلو",
+            name: "توده چربی",
+            showInLegend: true,
+        dataPoints: {{ bfm|safe }}
+          },{
+				    type: "column",
+            yValueFormatString: "0.#کیلو",
+            name: "عضله",
+            showInLegend: true,
+        dataPoints: {{ smm|safe }}
           }
-          else {
+          ]
+        });
+        chart.render();
+ 
+        function hideUnhideDataSeries(e) {
+          if (typeof (e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+            e.dataSeries.visible = false;
+          } else {
             e.dataSeries.visible = true;
           }
-          chart.render();
+ 
+          e.chart.render();
         }
-      },
-      data: [{
-        type: "stackedArea",
-        name: "وزن",
-        showInLegend: true,
-        yValueFormatString: "0.#کیلو",
-        markerSize: 0,
-        dataPoints: {{ weight|safe }}
-      },{
-        type: "stackedArea",        
-        name: "توده چربی",
-        showInLegend: true,
-        yValueFormatString: "0.#کیلو",
-        markerSize: 0,
-        dataPoints: {{ bfm|safe }}
-      },{
-        type: "stackedArea",
-        name: "عضله",
-        showInLegend: true,
-        yValueFormatString: "0.#کیلو",
-        markerSize: 0,
-        dataPoints: {{ smm|safe }}
-      },]
-    });
-    chart.render();
-  }
-</script>
+    }
+</script>    
+ 
 <script>
 function myFunction() {
   alert("اعمال گردید");

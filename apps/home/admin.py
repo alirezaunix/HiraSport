@@ -2,9 +2,9 @@
 
 from django.contrib.auth.models import User
 from django.contrib import admin
-from .models import Person, SportField, Peyment, SessionDate, Classi, AbsenceDate, Analysis, ValidAbsenceDate, Insurance, AttendanceSheet
+from .models import Person, SportField, Peyment, SessionDate, Classi, AbsenceDate, Analysis, ValidAbsenceDate,Insurance, AttendanceSheet
 from django.db.models.signals import post_save
-from .forms import PeymentForm, SessionForm, ClassiForm, InsuranceForm , AnalysisForm
+from .forms import PeymentForm, SessionForm, ClassiForm, InsuranceForm, AnalysisForm, AbsenceForm, ValidAbsenceForm
 from django.dispatch import receiver
 from django.contrib.auth.models import User
 import jdatetime
@@ -61,6 +61,13 @@ class SessionDateAdmin(admin.ModelAdmin):
     model = SessionDate
 
 
+@admin.register(AbsenceDate)
+class AbsenceDateAdmin(admin.ModelAdmin):
+    list_display = ['id', 'absent_person', 'doa']
+    form = AbsenceForm
+    model = AbsenceDate
+
+
 @admin.register(Classi)
 class ClassiAdmin(admin.ModelAdmin):
     list_display = ['id', 'weekdays', 'cname', 'starttime','ctrainer','fee','cgender']
@@ -76,18 +83,14 @@ class AnalysisAdmin(admin.ModelAdmin):
     #list_filter = ['analysis_person']
     #search_fields = ['analysis_person__full_name']
 
-
-@admin.register(AbsenceDate)
-class AbsenceDateAdmin(admin.ModelAdmin):
-    list_display = ['id','absent_person', 'doa']
-    search_fields = ['absent_person__full_name']
-    list_filter = ['doa']
-
 ##
 @admin.register(ValidAbsenceDate)
 class ValidAbsenceDateAdmin(admin.ModelAdmin):
     list_display = ['id','vabsent_person', 'dova']
     search_fields = ['vabsent_person__full_name']
+    form = ValidAbsenceForm
+    model = ValidAbsenceDate
+
     list_filter = ['dova']
 
 

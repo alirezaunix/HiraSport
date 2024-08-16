@@ -222,7 +222,7 @@ class AbsenceDate(models.Model):
     classname = models.ForeignKey(
         Classi, on_delete=models.CASCADE, null=True, blank=True, default=None, verbose_name="کلاس")
     absent_person = models.ForeignKey(
-        Person, on_delete=models.CASCADE, verbose_name='شخص')
+        Person, on_delete=models.CASCADE, verbose_name='شخص', blank=True, null=True)
     doa = jmodels.jDateField(verbose_name="تاریخ غیبت")
 
     class Meta:
@@ -394,3 +394,17 @@ class AttendanceSheet(models.Model):
         return f"{self.aname}"
 
 
+
+class SendSMS(models.Model):
+    id = models.AutoField(
+        primary_key=True, verbose_name='ردیف', editable=False)
+    send_person = models.ForeignKey(
+        Person, on_delete=models.CASCADE, verbose_name='شخص', blank=True, null=True ,editable=False)
+    send_dop = jmodels.jDateField(verbose_name="تاریخ ارسال", editable=False)
+
+    class Meta:
+        verbose_name = "ارسال پیامک"
+        verbose_name_plural = "ارسال پیامکها"
+
+    def __str__(self):
+        return f"{self.send_person}  {self.send_dop}"

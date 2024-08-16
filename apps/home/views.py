@@ -30,6 +30,7 @@ def date_maker():
 
 class PersonAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
+        #print("*********",self.q)
         qs = Person.objects.all()
         if self.q:
             qs = qs.filter(full_name__istartswith=self.q)
@@ -257,7 +258,23 @@ def personalreport(request, person_id):
                        "smm": smm, })
 ###############################
         context['jdate'] = date_maker()
+        try:
+            date_fields = tuple(f'doa_{i}' for i in range(1, 15))
+            alist = list(AttendanceSheet.objects.filter(aclass=person.classname).values_list(*date_fields))
+            alist_temp = []
+            for f in alist[-1]:
+                try:
+                    print(f)
+                    alist_temp.append(f.strftime('%Y-%m-%d'))
+                except:
+                    pass
+            context['attendance'] = alist_temp
+            print("&&&&&&&&&&&", alist_temp)
+        except:
+            pass
 
+        #AttendanceSheet.objects.all()
+        
         html_template = loader.get_template('home/personalreport.html')
         return HttpResponse(html_template.render(context, request))
     else:
