@@ -145,7 +145,7 @@
 
         {% for student in students %}   
           <tr>
-            <td>{{student}}</td>
+            <td><a href='/personalreport/{{student.id}}'> {{ student.full_name }}</a> </td>
             <td>{{student.insurancedate}}</td>
             <td>{{student.nextanalysis}}</td>
             {% for date in alist %}

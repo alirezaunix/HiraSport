@@ -59,6 +59,8 @@ class SessionDateAdmin(admin.ModelAdmin):
     list_display = ['id', 'session_person', 'dos']
     form = SessionForm
     model = SessionDate
+    search_fields = ['session_person__full_name']
+
 
 
 @admin.register(AbsenceDate)
@@ -66,13 +68,15 @@ class AbsenceDateAdmin(admin.ModelAdmin):
     list_display = ['id', 'absent_person', 'doa']
     form = AbsenceForm
     model = AbsenceDate
+    search_fields = ['absent_person__full_name']
+
 
 
 @admin.register(Classi)
 class ClassiAdmin(admin.ModelAdmin):
     list_display = ['id', 'weekdays', 'cname', 'starttime','ctrainer','fee','cgender']
     form = ClassiForm
-    search_fields = ['session_person__full_name']
+    search_fields = ['cname']
 
 
 @admin.register(Analysis)
@@ -81,7 +85,7 @@ class AnalysisAdmin(admin.ModelAdmin):
     form = AnalysisForm
     model = Analysis
     #list_filter = ['analysis_person']
-    #search_fields = ['analysis_person__full_name']
+    search_fields = ['analysis_person__full_name']
 
 ##
 @admin.register(ValidAbsenceDate)

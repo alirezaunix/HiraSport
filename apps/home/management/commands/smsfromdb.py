@@ -14,9 +14,9 @@ class Command(BaseCommand):
         weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun",]
         nextdayweekday=weekdays[datetime.today().weekday()+1]
         nextdayclass = Classi.objects.filter(weekdays__contains=nextdayweekday)
-        #queryset = Person.objects.filter(
-        #    rsession=1, classname__in=nextdayclass, is_active=True).exclude(Q(phone1__isnull=True) | Q(phone1=''))
-        queryset=Person.objects.filter(id=188)
+        queryset = Person.objects.filter(
+            rsession=1, classname__in=nextdayclass, is_active=True).exclude(Q(phone1__isnull=True) | Q(phone1=''))
+        #queryset=Person.objects.filter(id=188)
         self.my_custom_function(queryset)
         
     def senderSelection(self,phonenum):
