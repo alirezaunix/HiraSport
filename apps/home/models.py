@@ -373,6 +373,8 @@ class AttendanceSheet(models.Model):
     for i in range(1, 15):
         locals()[f'doa_{i}'] = jmodels.jDateField(
             verbose_name=f" تاریخ جلسه {i}", blank=True, null=True)
+        
+    doa_last = jmodels.jDateField(verbose_name=f" تاریخ آخرین جلسه ", blank=True, null=True,editable=False)
     STATE_CHOICES = [
         ('absent', 'غییت غیر مجاز'),
         ('present', 'حاضر'),
@@ -386,6 +388,7 @@ class AttendanceSheet(models.Model):
     created_at = models.DateTimeField(
         auto_now_add=True, verbose_name='تاریخ ایجاد',editable=False, blank=True,null=True)
 
+    
     class Meta:
         verbose_name = "لیست حضور و غیاب"
         verbose_name_plural = " لیستهای حضور و غیاب"
@@ -393,6 +396,12 @@ class AttendanceSheet(models.Model):
     def __str__(self):
         return f"{self.aname}"
 
+    def save(self, *args, **kwargs):
+        for i in range(1, 15):
+            if getattr(self, f"doa_{i}") != None:
+                self.doa_last = getattr(self, f"doa_{i}")
+                
+        super().save(*args, **kwargs)
 
 
 class SendSMS(models.Model):

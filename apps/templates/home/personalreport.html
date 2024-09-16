@@ -154,6 +154,7 @@
               <li class="active"><a href="#analysis" data-toggle="tab">آنالیز ها</a></li>
               <li><a href="#charts" data-toggle="tab">نمودار</a></li>
               <li><a href="#sessions" data-toggle="tab">گزارش حضور و غیاب</a></li>
+              <li><a href="#sheets" data-toggle="tab">گزارش ترم</a></li>
               <li><a href="#peyments" data-toggle="tab">گزارش پرداخت</a></li>
             </ul>
             <div class="tab-content">
@@ -245,6 +246,57 @@
 
                   </div>
                   <table class="table table-hover" id="table1" style="direction: rtl;">
+                      <thead>
+                          <tr>
+                              <th style="text-align: right;">ردیف</th>
+                              <th style="text-align: right;">روز حضور</th>
+                              <th style="text-align: right;">روز هفته</th>
+                              <th style="text-align: right;">وضعیت حضور</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          {% for s in session%}
+                          <tr>
+                              <td>{{s.id}}</td>
+                              <td>{{s.dos}}</td>
+                              <td>{{s.dos | wdayFinder}}</td>
+                              <td>حاضر</td>
+                          </tr>
+                          {%endfor%}
+                          {% for s in absence%}
+                          <tr>
+                              <td>{{s.id}}</td>
+                              <td>{{s.doa}}</td>
+                              <td>{{s.doa | wdayFinder}}</td>
+                              <td>غیبت غیر مجاز</td>
+                          </tr>
+                          {%endfor%}
+                          {% for v in vabsence%}
+                          <tr>
+                              <td>{{v.id}}</td>
+                              <td>{{v.dova}}</td>
+                              <td>{{v.dova | wdayFinder}}</td>
+                              <td>غیبت  مجاز</td>
+                          </tr>
+                          {%endfor%}
+
+                      </tbody>
+                  </table>
+                  <ul id="itemList"></ul>
+
+                </div>              
+              </div>
+              <div class="tab-pane" id="sheets">
+                <div class="box-body table-responsive no-padding">              
+
+                                  <select id="itemSelect"  name="sheetselect" >
+                                  <option value="">یک شیت انتخاب کنید</option>  
+                                  {% for attend in sheeto %}
+                                      <option value="{{attend.id}}"  data-start2="{{ attend.doa_1}}" data-end2="{{ attend.doa_last }}">{{ attend.aname }}</option>
+                                    {% endfor %}
+                                </select>
+
+                  <table class="table table-hover" id="table3" style="direction: rtl;">
                       <thead>
                           <tr>
                               <th style="text-align: right;">ردیف</th>
@@ -410,6 +462,7 @@ function myFunction() {
 </script>
 
 <script>
+var dataTab 
 function convertPersianToEnglishDigits(persianString) {
     // Ensure persianString is a string
     if (typeof persianString !== 'string') {
@@ -439,16 +492,13 @@ $(document).ready(function() {
     // Date range filtering
     $.fn.dataTable.ext.search.push(
         function(settings, data, dataIndex) {
-            console.log("OOOOO")
   
             startDateVal = $('#start-date').val();
             endDateVal = $('#end-date').val();
             //var date = new Date(data[1]); // Date column data
             dateVal=data[1]
-            
-            console.log(startDateVal)
-            console.log(endDateVal)
-            console.log(dateVal)
+            dataTab=data
+            //console.log(data)
 
             return (dateVal >= convertPersianToEnglishDigits(startDateVal) && dateVal <= convertPersianToEnglishDigits(endDateVal));
         }
@@ -475,6 +525,43 @@ $(document).ready(function() {
     table.draw();
 });
     
+var originalData
+var table3 
+$(document).ready(function() {
+    // Initialize DataTable
+    table3 = $('#table3').DataTable({
+        "order": [[1, "asc"]],
+        "searching": false,
+        "paging": false
+    });
+    originalData = table3.rows().data();
+});
+
+    $('#itemSelect').on('change', function() {
+        var selectedOption2 = $(this).find('option:selected');
+        var firstDate2 = selectedOption2.data('start2');
+        var lastDate2 = selectedOption2.data('end2');
+        //var rows=table3.rows().data();
+        var rows=originalData
+        console.log("first date",firstDate2)
+        console.log("last date",lastDate2)
+        console.log(table3)
+        var arr2=[];
+        console.log(rows.length)
+        for (var i=0; i<rows.length; i++){
+          var data2=rows[i];
+          if ((data2[1] >= firstDate2) && (data2[1] <= lastDate2)){
+                  console.log(i,data2)
+                  arr2.push(rows[i]);
+                }    
+    }
+
+    table3.clear();
+    table3.rows.add(arr2)
+    table3.draw();
+    });
+
+
 
 </script>
 

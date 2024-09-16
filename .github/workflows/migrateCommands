@@ -35,3 +35,90 @@ https://github.com/aliatayee/Attendance_Management_System
 
 
 django-celery-beat
+
+
+
+
+
+
+
+
+
+    function isDateInRange(date2, startDate2, endDate2) {
+            //return date2.filter(row => row.حضور); 
+        }
+    
+    function isDateInRange2(date2, startDate2, endDate2) {
+      for (let key in date2) {
+        if (!(date2[key] >= startDate2 && date2[key]<= endDate2)){
+          delete date2[key];
+        }
+      }
+      console.log(date2)
+      return date2
+      }
+ 
+    function filterItemsByDateRange(items2, startDate2, endDate2) {
+            return items2.filter(function(items2) {
+                var itemDate2 = table3.rows().column(1).data().toArray();  // The date is the second element
+                //console.log(itemDate2)
+                return isDateInRange2(itemDate2, startDate2, endDate2);
+            });
+        }
+
+    $('#itemSelect').on('change', function() {
+        var selectedOption2 = $(this).find('option:selected');
+        var firstDate2 = selectedOption2.data('start2');
+        var lastDate2 = selectedOption2.data('end2');
+
+        //var firstDate="{{attendance.0}}"
+        //var lastDate="{{attendance|last}}"
+        //attendanceList2={{ attendance_list_json|safe }};
+        //console.log(dataTab)
+        //var filteredItems2 = filterItemsByDateRange(dataTab, firstDate2, lastDate2);
+        //console.log(table3)
+        //var date2 = table3.rows().column(1).data().toArray();
+        //for (let key in table3) {
+         // if (!(date2[key] >= firstDate2 && date2[key]<= lastDate2)){
+         //   delete date2[key];
+        //  }
+        //}
+        //table3.clear();
+        //table3.rows.add(date2).draw();
+        
+
+
+    //        table3.rows().every(function(){
+    //          var data2=this.data();
+    //          if (data2 !== null ){
+    //            console.log(data2)
+    //            if (!(data2[1] >= firstDate2 && data2[1] <= lastDate2)){
+    //              console.log(data2)
+    //              this.remove();
+    //            }
+    //          }
+    //        
+    //        });
+    
+
+
+
+
+
+
+    $('#itemSelect').on('change', function() {
+        var selectedOption2 = $(this).find('option:selected');
+        var firstDate2 = selectedOption2.data('start2');
+        var lastDate2 = selectedOption2.data('end2');
+        var rows=table3.rows().data();
+        console.log(rows.length)
+        for (var i=0; i<rows.length; i++){
+          var data2=rows[i];
+          if ((data2[1] < firstDate2) || (data2[1] > lastDate2)){
+                  console.log(i,data2)
+                  table3.row(i).remove();
+                }    
+    }
+
+    table3.draw();
+    });

@@ -66,7 +66,7 @@ def todayclasslist(request):
         if request.method == 'POST':
             formdict = dict(request.POST)
             formdict.pop('csrfmiddlewaretoken')
-            print(formdict)
+            #print(formdict)
             for item in formdict['sheetselect']:
                 if len(item)>0:
                     destination_url = reverse('attendsheet', args=[
@@ -163,12 +163,12 @@ def classlist(request, ccname):
             cname_obj = Classi.objects.get(cname=ccname)
             
             inDate=request.POST.get("date").split(",")
-            print(inDate)
+            #print(inDate)
             di=int(inDate[0])
             mi = int(monthname[inDate[1]])
             yi=int(inDate[2])
             datePost=jdatetime.date(yi,mi,di).togregorian().strftime("%Y-%m-%d")
-            print("*****",datePost)
+            #print("*****",datePost)
             for student, attendance in request.POST.items():
                 #person_id = request.POST[item].split("_")[-1]
                 if student.isdigit():
@@ -225,12 +225,15 @@ def personalreport(request, person_id):
         
         session = SessionDate.objects.filter(session_person=person_id)
         context['session'] = session
+        print(session)
 
         absence = AbsenceDate.objects.filter(absent_person=person_id)
         context['absence'] = absence
+        print(absence)
 
         vabsence = ValidAbsenceDate.objects.filter(vabsent_person=person_id)
         context['vabsence'] = vabsence
+        print(vabsence)
 
         peyment = Peyment.objects.filter(peyment_person=person_id)
         context['peyment'] = peyment
@@ -254,26 +257,24 @@ def personalreport(request, person_id):
             smm.append({"label": ana.dot.strftime(
                 "%Y-%m-%d"), "y": ana.current_state_bfm})
         
-        context.update({"weight": weight, "bfm": bfm,
-                       "smm": smm, })
+        context.update({"weight": weight, "bfm": bfm,"smm": smm, })
 ###############################
         context['jdate'] = date_maker()
         try:
             date_fields = tuple(f'doa_{i}' for i in range(1, 15))
             alist = list(AttendanceSheet.objects.filter(aclass=person.classname).values_list(*date_fields))
-            alist_temp = []
+            alist_temp = []  # this  list has date in - format
             for f in alist[-1]:
                 try:
-                    print(f)
                     alist_temp.append(f.strftime('%Y-%m-%d'))
                 except:
                     pass
+            
             context['attendance'] = alist_temp
-            print("&&&&&&&&&&&", alist_temp)
+            context['sheeto'] = AttendanceSheet.objects.filter(
+                aclass=person.classname)
         except:
             pass
-
-        #AttendanceSheet.objects.all()
         
         html_template = loader.get_template('home/personalreport.html')
         return HttpResponse(html_template.render(context, request))
@@ -300,7 +301,7 @@ def trainerreport(request, trainer_id):
                     discounts+=i.discount
                 sumi+=(item.classname.fee/12*len(item.sstudent.all()) -
                     discounts*(item.classname.fee/12)/100)
-            print(sumi/2)
+            #print(sumi/2)
             context = {'segment': 'trainerreport'}
             context['trainer'] = trainer
             context['trainerseesion'] = trainerseesion
@@ -490,15 +491,15 @@ def attendsheet(request, ccname,sheetid):
         rsessionDict[student] = rsessionList
     context["rsessionDict"] = rsessionDict
 
-    dos={}
-    doa={}
-    dova={}
+    dos=dict()
+    doa = dict()
+    dova = dict()
     for i in (context['alist']):
         dos[i]= [ str(i.session_person.id) for i in SessionDate.objects.filter(dos=i)]
         doa[i] = [str(i.absent_person.id)
-                  for i in AbsenceDate.objects.filter(doa=i)]
+                for i in AbsenceDate.objects.filter(doa=i)]
         dova[i] = [str(i.vabsent_person.id)
-                   for i in ValidAbsenceDate.objects.filter(dova=i)]
+                for i in ValidAbsenceDate.objects.filter(dova=i)]
     context['dos'] = dos
     context['doa'] = doa
     context['dova'] = dova
@@ -506,7 +507,7 @@ def attendsheet(request, ccname,sheetid):
     context['sheetlist'] = AttendanceSheet.objects.get(
         id=sheetid)
     context['cname'] = cname_obj
-    print("+++++++",students)
+    #print("+++++++",students)
     
     #context['insurance'] = Insurance.objects.all()
     trainers = []

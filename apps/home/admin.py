@@ -2,7 +2,7 @@
 
 from django.contrib.auth.models import User
 from django.contrib import admin
-from .models import Person, SportField, Peyment, SessionDate, Classi, AbsenceDate, Analysis, ValidAbsenceDate,Insurance, AttendanceSheet
+from .models import Person, SportField, Peyment, SessionDate, Classi, AbsenceDate, Analysis, ValidAbsenceDate,Insurance, AttendanceSheet,SendSMS
 from django.db.models.signals import post_save
 from .forms import PeymentForm, SessionForm, ClassiForm, InsuranceForm, AnalysisForm, AbsenceForm, ValidAbsenceForm
 from django.dispatch import receiver
@@ -110,6 +110,12 @@ class AttendanceSheetAdmin(admin.ModelAdmin):
     get_person_display.short_description = 'Persons'
     
     
+    
+@admin.register(SendSMS)
+class SendSMSAdmin(admin.ModelAdmin):
+    list_display = ['id', 'send_person', 'send_dop']
+    search_fields = ['send_person__full_name']
+    list_filter = ['send_dop']
  ################## Actions Part ####################
     
     
