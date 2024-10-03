@@ -11,7 +11,7 @@ django-environ==0.8.1
 django-jalali==6.0.1
 django-multiselectfield==0.1.12
 executing==2.0.1
-gunicorn==20.1.0
+gunicorn==22.0.0
 ipython==8.22.1
 jdatetime==4.1.1
 jedi==0.19.1
@@ -73,7 +73,7 @@ fastapi-cli==0.0.4
 flet==0.23.1
 flet-core==0.23.1
 flet-runtime==0.23.1
-gunicorn==20.1.0
+gunicorn==22.0.0
 h11==0.14.0
 httpcore==1.0.5
 httptools==0.6.1
@@ -173,7 +173,7 @@ fastapi-cli==0.0.4
 flet==0.23.1
 flet-core==0.23.1
 flet-runtime==0.23.1
-gunicorn==20.1.0
+gunicorn==22.0.0
 h11==0.14.0
 httpcore==1.0.5
 httptools==0.6.1
@@ -274,7 +274,7 @@ fastapi-cli==0.0.4
 flet==0.23.1
 flet-core==0.23.1
 flet-runtime==0.23.1
-gunicorn==20.1.0
+gunicorn==22.0.0
 h11==0.14.0
 httpcore==1.0.5
 httptools==0.6.1
@@ -384,7 +384,7 @@ flet==0.23.1
 flet-core==0.23.1
 flet-runtime==0.23.1
 frozenlist==1.4.1
-gunicorn==20.1.0
+gunicorn==22.0.0
 h11==0.14.0
 httpcore==1.0.5
 httptools==0.6.1
