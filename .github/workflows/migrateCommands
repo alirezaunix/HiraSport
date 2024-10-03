@@ -122,3 +122,7 @@ django-celery-beat
 
     table3.draw();
     });
+
+
+
+    from apps.home.models import AttendanceSheet

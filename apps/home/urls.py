@@ -30,8 +30,11 @@ urlpatterns = [
     #     views.absencereport, name='absencereport'),
     path('classlist/<str:ccname>', views.classlist, name='classlist'),
     path('todayclasslist/', views.todayclasslist, name='todayclasslist'),
+    path('accounting/', views.accounting, name='accounting'),
     path('trainerslist/', views.trainerslist, name='trainerslist'),
     path('attendsheet/<str:ccname>/<str:sheetid>', views.attendsheet, name='attendsheet'),
+    path('accountingTable/<str:ccname>/<str:sheetid>',
+         views.accountingTable, name='accountingTable'),
 
     url(
         r'^autocomplete/$',

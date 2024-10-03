@@ -15,7 +15,7 @@ from .forms import AttendanceForm
 from django.forms import formset_factory
 import datetime
 from django_jalali.db import models as jmodels
-
+import copy
 
 
 def date_maker():
@@ -408,20 +408,27 @@ def attendsheet(request, ccname,sheetid):
 
         if request.method == 'POST':
             cname_obj = Classi.objects.get(cname=ccname)
+            trainer = cname_obj.ctrainer
+
             formdict=dict(request.POST)
             formdict.pop('csrfmiddlewaretoken')
             formdict.pop('register')
-            trainer_id = formdict.pop('trainer_select')
+            #trainer_id = formdict.pop('trainer_select')
+            studentList=[]
             for k,v in formdict.items():            
                 if '1' not in v[0]:
                     userID=k.split('_')[1]
                     person=Person.objects.get(id=userID)
+                    
                     dateFa=k.split('_')[2]
                     dateEn = jdatetime.date.fromisoformat(
                             dateFa).togregorian()
                     if v[0] =='2':
                         if not SessionDate.objects.filter(session_person=person, dos=dateEn, classname=cname_obj):
                             SessionDate.objects.create(session_person=person, dos=dateEn, classname=cname_obj)
+                            sessionObj = SessionDate.objects.create(session_person=trainer, dos=dateEn, classname=cname_obj)
+                            sessionObj.sstudent.add(person)
+                            sessionObj.save()
                             
                         if AbsenceDate.objects.filter(absent_person=person, doa=dateEn, classname=cname_obj):
                             AbsenceDate.objects.filter(
@@ -430,15 +437,21 @@ def attendsheet(request, ccname,sheetid):
                         if  ValidAbsenceDate.objects.filter(vabsent_person=person, dova=dateEn, classname=cname_obj):
                             ValidAbsenceDate.objects.filter(
                                 vabsent_person=person, dova=dateEn, classname=cname_obj).delete()
-                            
+                        studentList.append(person)
+                        
                     elif v[0]=='4':
                         if not AbsenceDate.objects.filter(absent_person=person, doa=dateEn, classname=cname_obj):
                             AbsenceDate.objects.create(absent_person=person, doa=dateEn, classname=cname_obj)
                             
                         if  SessionDate.objects.filter(session_person=person, dos=dateEn, classname=cname_obj):
-                            SessionDate.objects.filter(
-                                session_person=person, dos=dateEn, classname=cname_obj).delete()
+                            SessionDate.objects.filter( session_person=person, dos=dateEn, classname=cname_obj).delete()
+                            sessionObj = SessionDate.objects.filter(session_person=trainer, dos=dateEn, classname=cname_obj)
+                            for obj in list(sessionObj):
+                                if person in obj.sstudent.all():
+                                    obj.sstudent.remove(person)
+                                obj.save()
 
+                            
                         if  ValidAbsenceDate.objects.filter(vabsent_person=person, dova=dateEn, classname=cname_obj):
                             ValidAbsenceDate.objects.filter(
                                 vabsent_person=person, dova=dateEn, classname=cname_obj).delete()
@@ -452,13 +465,17 @@ def attendsheet(request, ccname,sheetid):
                                 absent_person=person, doa=dateEn, classname=cname_obj).delete()
 
                         if SessionDate.objects.filter(session_person=person, dos=dateEn, classname=cname_obj):
-                            SessionDate.objects.filter(
-                                session_person=person, dos=dateEn, classname=cname_obj).delete()
+                            SessionDate.objects.filter(session_person=person, dos=dateEn, classname=cname_obj).delete()
+                            sessionObj = SessionDate.objects.filter(session_person=trainer, dos=dateEn, classname=cname_obj)
+                            for obj in list(sessionObj):
+                                if person in obj.sstudent.all():
+                                    obj.sstudent.remove(person)
+                                obj.save()
 
-                        
-                        #TODO must select wich date to add to trainer session
-                        #TODO maybe absent or other in passed will change
 
+                
+                    
+                
             return HttpResponseRedirect(f'/attendsheet/{ccname}/{sheetid}')
     
     date_fields = tuple(f'doa_{i}' for i in range(1, 15))
@@ -520,3 +537,79 @@ def attendsheet(request, ccname,sheetid):
 
     html_template = loader.get_template('home/AttendanceSheet.html')
     return HttpResponse(html_template.render(context, request))
+
+
+@login_required(login_url="/login/")
+def accountingTable(request, ccname, sheetid):
+    if request.user.is_superuser:
+        monthname = {"فروردین": "01",  "اردیبهشت": "02",  "خرداد": "03",  "تیر": "04",  "مرداد": "05",
+                     "شهریور": "06",  "مهر": "07",  "آبان": "08",  "آذر": "09",  "دی": "10", "بهمن": "11",  "اسفند": "12"}
+        date_fields = tuple(f'doa_{i}' for i in range(1, 15))
+        alist = list(list(AttendanceSheet.objects.filter(id=sheetid).values_list(*date_fields))[0])
+        alist = [x for x in alist if x is not None]
+        #print(list(alist))
+        ccname = ccname.split("-")[0]
+        #print(f"{ccname=:}")
+        trainer_id=Classi.objects.get(cname=ccname).ctrainer.id
+        #print(f"{trainer_id=:}")
+        trainerseesion = SessionDate.objects.filter(
+        session_person=trainer_id)
+        print(sheetid)
+        for item in trainerseesion:
+            if item.dos in alist:                
+                for i in item.sstudent.all():
+                    print(i)
+                print("---",item.dos)
+                
+        dict_dos = dict()
+        list_trainersession = []
+        temp_list=[]
+        sumi=0
+        for item in trainerseesion:
+            if item.dos in alist:
+                dict_dos = dict()
+                temp_list.clear()
+                print(item.dos)
+                for i in item.sstudent.all():
+                    peyObj = Peyment.objects.filter(peyment_person=i).last()
+                    try:
+                        pey = peyObj.mcharged/peyObj.ncharged
+                        sumi+=float(pey)
+                        print(f"{pey=:}")
+                    except:
+                        pey=0
+                    temp_list.append({i:pey})
+                #dict_dos[item.dos] = temp_list  ##??
+                dict_dos.update({(item.dos).strftime('%Y-%m-%d'): temp_list})
+                print("dict",dict_dos)
+                list_trainersession.append(copy.deepcopy(dict_dos))
+                print(">>>--->>>", list_trainersession,sep="\n")
+            print("------------")
+
+    context = {'segment': 'classlist'}
+    context['sheetlist'] = AttendanceSheet.objects.get(id=sheetid)
+    context["trainersession"] = list_trainersession
+    context["halfsumi"]=sumi/2
+    context["trainer"] = Classi.objects.get(cname=ccname).ctrainer.full_name
+    html_template = loader.get_template('home/accountingTable.html')
+    return HttpResponse(html_template.render(context, request))
+
+
+@login_required(login_url="/login/")
+def accounting(request):
+    if request.user.is_superuser:
+        if request.method == 'POST':
+            formdict = dict(request.POST)
+            formdict.pop('csrfmiddlewaretoken')
+            for item in formdict['sheetselect']:
+                if len(item) > 0:
+                    destination_url = reverse('accountingTable', args=[
+                                            item.split("-")[0], item.split("-")[1]])
+                    return HttpResponseRedirect(destination_url)
+        context = {'segment': 'index'}
+        context['jdate'] = date_maker()
+        context['classi'] = Classi.objects.all()
+        attendance_sheets = AttendanceSheet.objects.all().order_by('-created_at')
+        context['attendance_sheets'] = attendance_sheets
+        html_template = loader.get_template('home/accounting.html')
+        return HttpResponse(html_template.render(context, request))

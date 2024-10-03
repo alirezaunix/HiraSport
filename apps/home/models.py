@@ -126,6 +126,9 @@ class Person(AbstractBaseUser):
     changeFlag=models.IntegerField(blank=True,default=0,editable=False)
     wallet =models.IntegerField(verbose_name="کیف پول", default=0,blank=True,null=True)
     
+    lastsession = jmodels.jDateField(blank=True, null=True,editable=False)
+        
+        
     nextanalysis = models.CharField(
         max_length=20, blank=True,editable=False)
 
@@ -303,6 +306,8 @@ class Peyment(models.Model):
     mcharged = models.IntegerField(
         verbose_name="مقدار پول واریز شده", blank=True, default=0)
     ncharged = models.IntegerField(verbose_name="تعداد جلسات شارژ شده")
+    created_at = models.DateTimeField(
+        auto_now_add=True, verbose_name='تاریخ ایجاد', editable=False, blank=True, null=True)
 
     class Meta:
         verbose_name = "پرداختی"
