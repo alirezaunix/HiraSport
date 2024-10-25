@@ -1,8 +1,8 @@
 {% extends "layouts/base.html" %}
 
 {% load dict_filter %}
-{% load  custom_filters %}
-{% block title %} لیست حضور و غیاب  {% endblock %} 
+
+{% block title %} جدول حسابداری  {% endblock %} 
 
 <!-- Element injected in the BODY element -->
 {% block body_class %} {% endblock body_class %} 
@@ -94,7 +94,11 @@
     background-color: #f5425a;
     color: white;
 }
-
+ .highlight-row {
+            font-weight: bold;
+            background-color: lightblue;
+            font-size: 1.2em; /* Increases the font size */
+        }
   </style>
 
 {% endblock stylesheets %}
@@ -112,12 +116,12 @@
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
     <section class="content-header">
+      <h3 dir="rtl">
+           {{sheetlist.aclass}}  {{cname.starttime}}  {{sheetlist.aname}}
+      </h3>
       <h1 dir="rtl">
-           {{sheetlist.aclass}}  {{cname.starttime}}
+         {{trainer}}
       </h1>
-      <h2 dir="rtl">
-         {{sheetlist.aname}}
-      </h2>
       <ol class="breadcrumb">
         <li><a href="/"><i class="fa fa-dashboard"></i> خانه</a></li>
         <li><a href="#"> لیست حضور و غیاب</a></li>
@@ -135,71 +139,34 @@
       </thead>
       <tbody>
         <tr>
-          <td>نام</td>
-          <td>تاریخ بعدی بیمه</td>
-          <td>تاریخ آنالیز بعدی </td>
-          {% for al in alist %}
-          <td > {{ al  }} </td>
-          {% endfor %}
+          <td>تاریخ</td>
+          <td>نام شاگرد</td>
+          <td>شهریه یک جلسه</td>
         </tr>
 
-        {% for student in students %}   
+        {% for item in trainersession %}
+            {% for date, persons in item.items %}
+                {% for person_dict in persons %}
           <tr>
-            <td><a href='/personalreport/{{student.id}}'> {{ student.full_name }}</a> </td>
-            <td>{{student.insurancedate}}</td>
-            <td>{{student.nextanalysis|date_only  }}</td>
-            {% for date in alist %}
-                  {% if student.id|stringformat:"s" in dos|dict_filter:date %}
-                  <td>
-                                <button type="button" class="stateButton btn btn-present  data-name="{{student.id}}" data-date="{{date}}" data-state="2"><i class="fa fa-check" aria-hidden="true"></i></button>
-                                <input type="hidden" name="state_{{student.id}}_{{date}}" value="2">
-                    </td>
-                  {% elif student.id|stringformat:"s" in doa|dict_filter:date %}
-                  <td>
-                                <button type="button" class="stateButton btn btn-absent  data-name="{{student.id}}" data-date="{{date}}" data-state="4"><i class="fa fa-times" aria-hidden="true"></i></button>
-                                <input type="hidden" name="state_{{student.id}}_{{date}}" value="4">
-
-                  </td>
-                  {% elif student.id|stringformat:"s" in dova|dict_filter:date %}
-                  <td>
-
-                                <button type="button" class="stateButton btn btn-valid-absent   data-name="{{student.id}}" data-date="{{date}}" data-state="3"><i class="fa fa-circle-o-notch" aria-hidden="true"></i></button>
-                                <input type="hidden" name="state_{{student.id}}_{{date}}" value="3">
-
-                    </td>
-
-                    {% else %}
-                        <td>
-                          <button type="button" class="stateButton btn btn-light  data-name="{{student.id}}" data-date="{{date}}" data-state="1">-</button>
-                          <input type="hidden" name="state_{{student.id}}_{{date}}" value="1">
-                        </td>
-                  
-                    {% endif%}
-              {% endfor %}
-          </tr> 
+                <td>{{ date }}</td>                
+                {% for person, cost in person_dict.items %}
+                    <td >{{ person }}</td>
+                    <td >{{ cost | floatformat:1 }}</td>
+                {% endfor %}
+            </tr>
+                {% endfor %}
+            {% endfor %}
         {% endfor %}
-          <tr>
-            <td>مربی</td>
-            <td>
-                      <button type="button" class="btn btn-light" data-name="{{student.id}}" data-date="{{date}}" data-state="1">------------</button>
-                      <input type="hidden" name="state_{{student.id}}_{{date}}" value="1">
-                    </td>
-            <td>
-                      <button type="button" class="btn btn-light" data-name="{{student.id}}" data-date="{{date}}" data-state="1">------------</button>
-                      <input type="hidden" name="state_{{student.id}}_{{date}}" value="1">
-                    </td>
-            {% for date in alist %} 
-            <td>
-              <select form="myForm" name="trainer_select" class="form-control select2" style="width: 100%;">
-                
-                <option  value="{{trainer.id}}_{{date}}">{{cname.ctrainer}}</option>
-                {% for trainer in trainers %}
-                  <option  value="{{trainer.id}}_{{date}}">{{trainer.full_name}}</option>
-                  {% endfor%}
-                </select>
-            </td>   
-          {%endfor%}
-          </tr>
+            <tr class=highlight-row>
+              <td>سهم مربی</td>
+              <td></td>
+              <td>{{halfsumi| floatformat:1}}</td>
+            </tr>
+            <tr class=highlight-row>
+              <td>سهم باشگاه</td>
+              <td></td>
+              <td>{{halfsumi| floatformat:1}}</td>
+            </tr>
       </tbody>
     </table>
   </form>
@@ -208,60 +175,8 @@
       </div>
     </section>
       
-      <section>
-        <div class="col-xs-12">
-          <div class="box">
-            <div class="box-header">
-              <div class="box-tools">
-                <div class="input-group input-group-sm" style="width: 150px;">                  
-                </div>
-              </div>
-            </div>
-            <!-- /.box-header -->
 
-            <!-- /.box-body -->
-          </div>
-          <!-- /.box -->
-        </div>
-      </section>
 
-   
-    <section class="content">
-      <div class="callout callout-info">
-        <h4>توجه</h4>
-                <p>
-حضور و غیاب همه نفرات را مشخص کنید و سپس مربی را انتخاب و در نهایت دکمه ثبت را بزنید<br>به هیچ عنوان صفحه را رفرش نکنید یا از back استفاده نکنید
-        </p> 
-
-         <p>
-        <button type="button" class="stateButton btn btn-present" data-name="" data-date="" data-state=""><i class="fa fa-check" aria-hidden="true"></i></button>
-        حضور
-      </p>
-      <p>
-        <button type="button" class="stateButton btn btn-valid-absent" data-name="" data-date="" data-state=""><i class="fa fa-circle-o-notch" aria-hidden="true"></i></button>
-        غیبت مجاز
-      </p>
-
-        <p>
-        <button type="button" class="stateButton btn btn-absent" data-name="" data-date="" data-state=""><i class="fa fa-times" aria-hidden="true"></i></button>
-        غیبت 
-      </p>
-      <p>
-        <button type="button" class="stateButton btn btn-light" data-name="" data-date="" data-state="" style="color:black">-</button>
-        مورد ثبت نشده 
-      </p>
-</div>
-
-      <div class="row">
-        <div class="col-xs-12">
-          <div class="box box-default">
-            <div class="box-body">
-                <button id="submitting" onclick="myFunction()" form="myForm" type="submit" name="register"   class="btn btn-success" data-toggle="modal" data-target="#modal-success" >ثبت حضور و غیاب</button>
-
-              </div>
-          </div>
-        </div>
-      </div>
     <!-- /.content -->
    </div>
   
@@ -442,3 +357,7 @@ function myFunction() {
 
 
 {% endblock javascripts %}
+
+
+
+

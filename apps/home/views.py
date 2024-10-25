@@ -544,6 +544,92 @@ def accountingTable(request, ccname, sheetid):
     if request.user.is_superuser:
         monthname = {"فروردین": "01",  "اردیبهشت": "02",  "خرداد": "03",  "تیر": "04",  "مرداد": "05",
                      "شهریور": "06",  "مهر": "07",  "آبان": "08",  "آذر": "09",  "دی": "10", "بهمن": "11",  "اسفند": "12"}
+
+        # sheetid = ccname.split("-")[1]
+        ccname = ccname.split("-")[0]
+        studentList = []
+        students = []
+        AttendanceFormSet = formset_factory(AttendanceForm, extra=0)
+        for obj in Person.objects.filter(role='student'):
+            if not obj.is_admin:
+                if obj.classname != None and obj.classname.cname == ccname:
+                    students.append(obj)
+        formset = AttendanceFormSet(request.POST or None, initial=[
+                                    {'name': student.full_name} for student in students])
+        cname_obj = Classi.objects.get(cname=ccname)
+
+
+    date_fields = tuple(f'doa_{i}' for i in range(1, 15))
+    alist = AttendanceSheet.objects.filter(
+        id=sheetid).values_list(*date_fields)
+    context = {'segment': 'classlist'}
+    person = []
+    context['person'] = person
+    alist_temp=[]
+    for f in alist[0]:
+        try:
+            alist_temp.append(f.strftime('%Y-%m-%d'))
+        except:
+            pass
+    context['alist'] = alist_temp
+    
+    rsessionDict={k:[] for k in students}
+    for student in students:
+        jnow=jdatetime.datetime.now()
+        jnow = jdatetime.date(jnow.year, jnow.month, jnow.day)
+        rsessionCounter=student.rsession
+        rsessionList = [-1]*len(alist_temp)
+        for i,datei in enumerate(alist[0]):
+            try:
+                if jnow< datei:
+                    rsessionList[i] = rsessionCounter
+                    rsessionCounter-=1
+            except:
+                pass
+        rsessionDict[student] = rsessionList
+    context["rsessionDict"] = rsessionDict
+
+    dos=dict()
+    doa = dict()
+    dova = dict()
+    for i in (context['alist']):
+        dos[i]= [ str(i.session_person.id) for i in SessionDate.objects.filter(dos=i)]
+        doa[i] = [str(i.absent_person.id)
+                for i in AbsenceDate.objects.filter(doa=i)]
+        dova[i] = [str(i.vabsent_person.id)
+                for i in ValidAbsenceDate.objects.filter(dova=i)]
+    context['dos'] = dos
+    context['doa'] = doa
+    context['dova'] = dova
+    
+    context['sheetlist'] = AttendanceSheet.objects.get(
+        id=sheetid)
+    context['cname'] = cname_obj
+    #print("+++++++",students)
+    
+    #context['insurance'] = Insurance.objects.all()
+    trainers = []
+    for obj in Person.objects.filter(role='trainer'):
+        trainers.append(obj)
+    context['jdate'] = date_maker()
+    context['formset'] = formset
+    context['students'] = students
+    pays={}
+    for student in students:
+        print(student)
+        peyObj = Peyment.objects.filter(peyment_person=student).last()
+        try:
+                        pey = peyObj.mcharged/peyObj.ncharged
+                        print(f"{pey=:}")
+        except:
+                        pey = 0
+        pays[student]=pey
+    print(pays)
+    context['peyment'] = pays
+
+    '''if request.user.is_superuser:
+        monthname = {"فروردین": "01",  "اردیبهشت": "02",  "خرداد": "03",  "تیر": "04",  "مرداد": "05",
+                     "شهریور": "06",  "مهر": "07",  "آبان": "08",  "آذر": "09",  "دی": "10", "بهمن": "11",  "اسفند": "12"}
         date_fields = tuple(f'doa_{i}' for i in range(1, 15))
         alist = list(list(AttendanceSheet.objects.filter(id=sheetid).values_list(*date_fields))[0])
         alist = [x for x in alist if x is not None]
@@ -591,6 +677,7 @@ def accountingTable(request, ccname, sheetid):
     context["trainersession"] = list_trainersession
     context["halfsumi"]=sumi/2
     context["trainer"] = Classi.objects.get(cname=ccname).ctrainer.full_name
+    '''
     html_template = loader.get_template('home/accountingTable.html')
     return HttpResponse(html_template.render(context, request))
 

@@ -1,8 +1,9 @@
 {% extends "layouts/base.html" %}
 
 {% load dict_filter %}
+{% load custom_filters %}
 
-{% block title %} جدول حسابداری  {% endblock %} 
+{% block title %} لیست حضور و غیاب  {% endblock %} 
 
 <!-- Element injected in the BODY element -->
 {% block body_class %} {% endblock body_class %} 
@@ -36,6 +37,10 @@
         border: 1px solid #63b9e0; /* Adjust the border color as needed */
         text-align: center; /* Center the text horizontally */
         vertical-align: middle; /* Center the text vertically */
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box; /* Ensure padding is included in the button's dimensions */
+
     }
 
     button {
@@ -94,11 +99,7 @@
     background-color: #f5425a;
     color: white;
 }
- .highlight-row {
-            font-weight: bold;
-            background-color: lightblue;
-            font-size: 1.2em; /* Increases the font size */
-        }
+
   </style>
 
 {% endblock stylesheets %}
@@ -116,15 +117,15 @@
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
     <section class="content-header">
-      <h3 dir="rtl">
-           {{sheetlist.aclass}}  {{cname.starttime}}  {{sheetlist.aname}}
-      </h3>
       <h1 dir="rtl">
-         {{trainer}}
+           {{sheetlist.aclass}}  {{cname.starttime}}
       </h1>
+      <h2 dir="rtl">
+         {{sheetlist.aname}}
+      </h2>
       <ol class="breadcrumb">
         <li><a href="/"><i class="fa fa-dashboard"></i> خانه</a></li>
-        <li><a href="#"> لیست حضور و غیاب</a></li>
+        <li><a href="#">   محاسبات</a></li>
       </ol>
     </section>
 
@@ -139,35 +140,52 @@
       </thead>
       <tbody>
         <tr>
-          <td>تاریخ</td>
-          <td>نام شاگرد</td>
-          <td>شهریه یک جلسه</td>
+          <td>نام</td>
+          {% for al in alist %}
+          <td > {{ al  }} </td>
+          {% endfor %}
+          <td>مجموع</td>
         </tr>
 
-        {% for item in trainersession %}
-            {% for date, persons in item.items %}
-                {% for person_dict in persons %}
+        {% for student in students %}   
           <tr>
-                <td>{{ date }}</td>                
-                {% for person, cost in person_dict.items %}
-                    <td >{{ person }}</td>
-                    <td >{{ cost | floatformat:1 }}</td>
-                {% endfor %}
-            </tr>
-                {% endfor %}
-            {% endfor %}
+            <td><a href='/personalreport/{{student.id}}'> {{ student.full_name }}</a> </td>
+            {% for date in alist %}
+                  {% if student.id|stringformat:"s" in dos|dict_filter:date %}
+                  <td>
+                                <button type="button" class="stateButton btn btn-present  data-name="{{student.id}}" data-date="{{date}}" data-state="2">{{ peyment|dict_filter:student|floatformat:1 }}</button>
+                                <input type="hidden" name="state_{{student.id}}_{{date}}" value="2">
+                    </td>
+                  {% elif student.id|stringformat:"s" in doa|dict_filter:date %}
+                  <td>
+                                <button type="button" class="stateButton btn btn-absent  data-name="{{student.id}}" data-date="{{date}}" data-state="4">{{ peyment|dict_filter:student|floatformat:1 }}</button>
+                                <input type="hidden" name="state_{{student.id}}_{{date}}" value="4">
+
+                  </td>
+                  {% elif student.id|stringformat:"s" in dova|dict_filter:date %}
+                  <td>
+
+                                <button type="button" class="stateButton btn btn-valid-absent   data-name="{{student.id}}" data-date="{{date}}" data-state="3"><i class="fa fa-circle-o-notch" aria-hidden="true"></i></button>
+                                <input type="hidden" name="state_{{student.id}}_{{date}}" value="3">
+
+                    </td>
+                    {% else %}
+                        <td>
+                          <button type="button" class="stateButton btn btn-light  data-name="{{student.id}}" data-date="{{date}}" data-state="1">-</button>
+                          <input type="hidden" name="state_{{student.id}}_{{date}}" value="1">
+                        </td>
+                  
+                    {% endif%}
+              {% endfor %}
+              <td> * </td>
+          </tr> 
         {% endfor %}
-            <tr class=highlight-row>
-              <td>سهم مربی</td>
-              <td></td>
-              <td>{{halfsumi| floatformat:1}}</td>
-            </tr>
-            <tr class=highlight-row>
-              <td>سهم باشگاه</td>
-              <td></td>
-              <td>{{halfsumi| floatformat:1}}</td>
-            </tr>
-      </tbody>
+  <tr>
+      <td style="font-size: 1.5rem;"> سهم مربی <b>{{cname.ctrainer}}<b> </td>
+      <td style="font-weight: bold;font-size: 1.5rem;" colspan=13>-</td>
+      <td style="font-weight: bold;font-size: 1.5rem;">-</td>
+    </tr>      
+  </tbody>
     </table>
   </form>
  
@@ -175,7 +193,22 @@
       </div>
     </section>
       
+      <section>
+        <div class="col-xs-12">
+          <div class="box">
+            <div class="box-header">
+              <div class="box-tools">
+                <div class="input-group input-group-sm" style="width: 150px;">                  
+                </div>
+              </div>
+            </div>
+            <!-- /.box-header -->
 
+            <!-- /.box-body -->
+          </div>
+          <!-- /.box -->
+        </div>
+      </section>
 
     <!-- /.content -->
    </div>
@@ -313,51 +346,41 @@
   })
 </script>
 
-
-
 <script>
-// script.js
+function calculateSums() {
+    const table = document.getElementById('example2');
+    const rows = table.rows;
+    let totalSum = 0;
 
-document.addEventListener('DOMContentLoaded', (event) => {
-    const stateButtons = document.querySelectorAll('.stateButton');
-    const states = [
-        { class: 'btn-light', text: '-', value: 1 },
-        { class: 'btn-present', text: '-', value: 2 },
-        { class: 'btn-valid-absent', text: '-', value: 3 },
-        { class: 'btn-absent', text: '-', value: 4 }
-    ];
+    for (let i = 1; i < rows.length - 1; i++) { 
+        const cells = rows[i].cells;
+        let rowSum = 0;
 
-    stateButtons.forEach(button => {
-        let currentState = 0;
+        // Calculate the sum up to the column before the last one
+        for (let j = 3; j < cells.length - 1; j++) { 
+            rowSum += parseFloat(cells[j].innerText) || 0;
+        }
 
-        button.addEventListener('click', () => {
-            currentState = (currentState + 1) % states.length;
-            button.className = `stateButton btn ${states[currentState].class}`;
-            button.textContent = states[currentState].text;
-            button.dataset.state = states[currentState].value;
+        // Format the row sum and place it in the last cell of the current row
+        cells[cells.length - 1].innerText = formatNumber(rowSum);
 
-            // Update the corresponding hidden input value
-            const hiddenInput = button.nextElementSibling;
-            hiddenInput.value = states[currentState].value;
-        });
-    });
-});
+        totalSum += rowSum;
+    }
 
-function myFunction() {
-  alert("اعمال گردید");
-    
-    const stateForm = document.getElementById('stateForm');
-
-    // Submit the form
-    stateForm.submit();
+    // Place the total sum in the last cell of the last row
+    const lastRowCells = rows[rows.length - 1].cells;
+    lastRowCells[lastRowCells.length - 2].innerText = formatNumber(totalSum / 2);
 }
 
+function formatNumber(num) {
+    return num.toLocaleString('en-US', {
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1
+    }).replace(/,/g, '\u00A0'); // Use non-breaking space
+}
+
+calculateSums();
 </script>
 
 
-
 {% endblock javascripts %}
-
-
-
-
