@@ -85,20 +85,51 @@
     }
 
 
-.btn-present {
-    background-color: #42f59b;
-    color: black;
-}
+.in-absent {
+            background-color: #f5425a;
+            border: none; /* Remove border */
+            padding: 10px; /* Add padding */
+            font-size: 16px; /* Set font size */
+            cursor: pointer; /* Change cursor to pointer */
+            display: inline-block; /* Make it inline-block */
+            width: 200px; /* Set width */
+            text-align: center; /* Center text */
+        }
 
-.btn-valid-absent {
-    background-color: #f5dd42;
-    color: black;
-}
+.in-valid-absent {
+            background-color: #f5dd42;
+            border: none; /* Remove border */
+            padding: 10px; /* Add padding */
+            font-size: 16px; /* Set font size */
+            cursor: pointer; /* Change cursor to pointer */
+            display: inline-block; /* Make it inline-block */
+            width: 200px; /* Set width */
+            text-align: center; /* Center text */
+        }
 
-.btn-absent {
-    background-color: #f5425a;
-    color: white;
-}
+.in-present {
+            background-color: #42f59b;
+            border: none; /* Remove border */
+            padding: 10px; /* Add padding */
+            font-size: 16px; /* Set font size */
+            cursor: pointer; /* Change cursor to pointer */
+            display: inline-block; /* Make it inline-block */
+            width: 200px; /* Set width */
+            text-align: center; /* Center text */
+        }
+
+.in-unknown {
+            background-color: #ffffff;
+            border: none; /* Remove border */
+            padding: 10px; /* Add padding */
+            font-size: 16px; /* Set font size */
+            cursor: pointer; /* Change cursor to pointer */
+            display: inline-block; /* Make it inline-block */
+            width: 200px; /* Set width */
+            text-align: center; /* Center text */
+        }
+
+
 
   </style>
 
@@ -152,27 +183,20 @@
             <td><a href='/personalreport/{{student.id}}'> {{ student.full_name }}</a> </td>
             {% for date in alist %}
                   {% if student.id|stringformat:"s" in dos|dict_filter:date %}
-                  <td>
-                                <button type="button" class="stateButton btn btn-present  data-name="{{student.id}}" data-date="{{date}}" data-state="2">{{ peyment|dict_filter:student|floatformat:1 }}</button>
-                                <input type="hidden" name="state_{{student.id}}_{{date}}" value="2">
+                    <td>
+                        <input class=" in-present" type="text" name="state_{{student.id}}_{{date}}" value="{{ peyment|dict_filter:student|floatformat:1 }}">
                     </td>
                   {% elif student.id|stringformat:"s" in doa|dict_filter:date %}
                   <td>
-                                <button type="button" class="stateButton btn btn-absent  data-name="{{student.id}}" data-date="{{date}}" data-state="4">{{ peyment|dict_filter:student|floatformat:1 }}</button>
-                                <input type="hidden" name="state_{{student.id}}_{{date}}" value="4">
-
+                        <input class=" in-absent"  type="text" name="state_{{student.id}}_{{date}}" value="{{ peyment|dict_filter:student|floatformat:1 }}">
                   </td>
                   {% elif student.id|stringformat:"s" in dova|dict_filter:date %}
                   <td>
-
-                                <button type="button" class="stateButton btn btn-valid-absent   data-name="{{student.id}}" data-date="{{date}}" data-state="3"><i class="fa fa-circle-o-notch" aria-hidden="true"></i></button>
-                                <input type="hidden" name="state_{{student.id}}_{{date}}" value="3">
-
+                        <input class=" in-valid-absent" type="text" name="state_{{student.id}}_{{date}}" value="{{ peyment|dict_filter:student|floatformat:1 }}">
                     </td>
                     {% else %}
                         <td>
-                          <button type="button" class="stateButton btn btn-light  data-name="{{student.id}}" data-date="{{date}}" data-state="1">-</button>
-                          <input type="hidden" name="state_{{student.id}}_{{date}}" value="1">
+                          <input class="in-unknown" type="text" name="state_{{student.id}}_{{date}}" value="0">
                         </td>
                   
                     {% endif%}
@@ -249,6 +273,7 @@
 
   <!-- page script -->
   <script>
+
     $(function () {
       $('#example2').DataTable({
         'scrollX': true,
@@ -347,40 +372,72 @@
 </script>
 
 <script>
+// Add formatNumber function
+function formatNumber(num) {
+    // Format with 1 decimal place and use Persian/Arabic numerals
+    return num.toLocaleString('fa-IR', { 
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1 
+    });
+}
+
 function calculateSums() {
     const table = document.getElementById('example2');
     const rows = table.rows;
+    let columnSums = new Array(rows[0].cells.length - 2).fill(0);
     let totalSum = 0;
 
-    for (let i = 1; i < rows.length - 1; i++) { 
+    // Start from row 1 (after header) and end before last row (trainer row)
+    for (let i = 1; i < rows.length - 1; i++) {
         const cells = rows[i].cells;
         let rowSum = 0;
 
-        // Calculate the sum up to the column before the last one
-        for (let j = 3; j < cells.length - 1; j++) { 
-            rowSum += parseFloat(cells[j].innerText) || 0;
+        // Start from column 1 (after name) and end before last column (sum column)
+        for (let j = 1; j < cells.length - 1; j++) {
+            const input = cells[j].querySelector('input');
+            if (input) {
+                // Convert value to number and handle invalid inputs
+                const value = parseFloat(input.value.replace(/[^\d.-]/g, '')) || 0;
+                columnSums[j-1] += value;
+                rowSum += value;
+            }
         }
 
-        // Format the row sum and place it in the last cell of the current row
-        cells[cells.length - 1].innerText = formatNumber(rowSum);
-
+        // Update the sum cell for this row
+        const sumCell = cells[cells.length - 1];
+        if (sumCell) {
+            sumCell.textContent = formatNumber(rowSum);
+        }
         totalSum += rowSum;
     }
 
-    // Place the total sum in the last cell of the last row
-    const lastRowCells = rows[rows.length - 1].cells;
-    lastRowCells[lastRowCells.length - 2].innerText = formatNumber(totalSum / 2);
+    // Update the trainer's total in the last row
+    const lastRow = rows[rows.length - 1];
+    if (lastRow) {
+        const trainerTotalCell = lastRow.cells[lastRow.cells.length - 2];
+        if (trainerTotalCell) {
+            trainerTotalCell.textContent = formatNumber(totalSum / 2);
+        }
+    }
 }
 
-function formatNumber(num) {
-    return num.toLocaleString('en-US', {
-        minimumFractionDigits: 1,
-        maximumFractionDigits: 1
-    }).replace(/,/g, '\u00A0'); // Use non-breaking space
+// Add event listeners to recalculate when inputs change
+function setupCalculationListeners() {
+    const table = document.getElementById('example2');
+    if (table) {
+        table.addEventListener('input', function(e) {
+            if (e.target.tagName === 'INPUT') {
+                calculateSums();
+            }
+        });
+    }
 }
 
-calculateSums();
+// Initialize calculations when document loads
+document.addEventListener('DOMContentLoaded', function() {
+    setupCalculationListeners();
+    calculateSums(); // Initial calculation
+});
 </script>
-
 
 {% endblock javascripts %}
