@@ -310,7 +310,8 @@ def trainerreport(request, trainer_id):
             context['sumOfMounth']=sumi/2
             context['superuserview'] = True if request.user.is_superuser or request.user.role=="trainer" else False
             context['jdate'] = date_maker()
-
+            context['sheeto'] = AttendanceSheet.objects.filter(
+                aclass=trainer.classname)
             html_template = loader.get_template('home/trainerreport.html')
             return HttpResponse(html_template.render(context, request))
 '''
